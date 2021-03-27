@@ -23,9 +23,7 @@ public class Backgammon2 {
 
         LinkedList<Triangle> triangles = new LinkedList<>();
         addElements(triangles);
-        
-        LinkedList<Triangle> pieces = new LinkedList<>();
-        addElements(pieces);
+       
         
         JPanel jpanel = new JPanel() {
             @Override
@@ -33,10 +31,16 @@ public class Backgammon2 {
                 for (Triangle t : triangles) {
                     g.setColor(t.color);
                     g.fillPolygon(t.x, t.y, 3);
+                    
+                    for(Piece p : t.pieces){
+                        g.setColor(p.color);
+                        g.fillOval(p.x, p.y, p.r, p.r);
+                    }
                 }
                 
                 g.setColor(Color.YELLOW);
                 g.fillRect(480, 0, 50, 650);
+                
             }
 
         };
@@ -89,26 +93,41 @@ public class Backgammon2 {
 
     static void addElements(LinkedList list) {
         Color color = null;
-        for (int i = 1; i <= 6; i++) {
+        
+        // Section 1
+        for (int i = 6; i >= 1; i--) {
             if (i % 2 == 0) {
                 color = Color.BLACK;
             }
             else {
                 color = Color.RED;
             }
-            list.add(new Triangle(new int[]{(i - 1) * 80, 40 + 80 * (i - 1), i * 80}, new int[]{0, 300, 0}, 0, i, color));
+            list.add(new Triangle(new int[]{530 + (i - 1) * 80, 530 + 40 + 80 * (i - 1), 530 + i * 80}, new int[]{0, 300, 0}, 0, 6 - i, color));
         }
-
-        for (int i = 1; i <= 6; i++) {
+        
+        // Section 2
+        for (int i = 6; i >= 1; i--) {
             if (i % 2 == 0) {
                 color = Color.BLACK;
             }
             else {
                 color = Color.RED;
             }
-            list.add(new Triangle(new int[]{530 + (i - 1) * 80, 530 + 40 + 80 * (i - 1), 530 + i * 80}, new int[]{0, 300, 0}, 0, i + 6, color));
+            list.add(new Triangle(new int[]{(i - 1) * 80, 40 + 80 * (i - 1), i * 80}, new int[]{0, 300, 0}, 0, 12 - i, color));
         }
-
+        
+        // Section 3
+        for (int i = 1; i <= 6; i++) {  
+            if (i % 2 == 0) {
+                color = Color.RED;
+            }
+            else {
+                color = Color.BLACK;
+            }
+            list.add(new Triangle(new int[]{(i - 1) * 80, 40 + 80 * (i - 1), i * 80}, new int[]{650, 350, 650}, 0, i + 11, color));
+        }
+        
+        // Section 4
         for (int i = 1; i <= 6; i++) {
             if (i % 2 == 0) {
                 color = Color.RED;
@@ -116,18 +135,56 @@ public class Backgammon2 {
             else {
                 color = Color.BLACK;
             }
-            list.add(new Triangle(new int[]{530 + (i - 1) * 80, 530 + 40 + 80 * (i - 1), 530 + i * 80}, new int[]{650, 350, 650}, 0, i + 12, color));
+            list.add(new Triangle(new int[]{530 + (i - 1) * 80, 530 + 40 + 80 * (i - 1), 530 + i * 80}, new int[]{650, 350, 650}, 0, i + 17, color));
         }
-
-        for (int i = 1; i <= 6; i++) {
-            if (i % 2 == 0) {
-                color = Color.RED;
-            }
-            else {
-                color = Color.BLACK;
-            }
-            list.add(new Triangle(new int[]{(i - 1) * 80, 40 + 80 * (i - 1), i * 80}, new int[]{650, 350, 650}, 0, i + 18, color));
-        }
+        
+        
+        Triangle t = (Triangle) list.get(0);
+        t.pieces.add(new Piece(t.x[0] + 10, 0, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 60, 60, Color.yellow));
+        
+        t = (Triangle) list.get(5);
+        t.pieces.add(new Piece(t.x[0] + 10, 0, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 60, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 120, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 180, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 240, 60, Color.blue));
+        
+        t = (Triangle) list.get(7);
+        t.pieces.add(new Piece(t.x[0] + 10, 0, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 60, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 120, 60, Color.blue));
+        
+        t = (Triangle) list.get(11);
+        t.pieces.add(new Piece(t.x[0] + 10, 0, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 60, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 120, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 180, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 240, 60, Color.yellow));
+        
+        t = (Triangle) list.get(12);
+        t.pieces.add(new Piece(t.x[0] + 10, 650-60, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-120, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-180, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-240, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-300, 60, Color.blue));
+        
+        t = (Triangle) list.get(16);
+        t.pieces.add(new Piece(t.x[0] + 10, 650-60, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-120, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-180, 60, Color.yellow));
+        
+        t = (Triangle) list.get(18);
+        t.pieces.add(new Piece(t.x[0] + 10, 650-60, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-120, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-180, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-240, 60, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-300, 60, Color.yellow));
+        
+         t = (Triangle) list.get(23);
+        t.pieces.add(new Piece(t.x[0] + 10, 650-60, 60, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + 10, 650-120, 60, Color.blue));
+        
     }
 
 }

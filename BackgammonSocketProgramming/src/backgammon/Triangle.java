@@ -1,6 +1,7 @@
 package backgammon;
 
 import java.awt.Color;
+import java.util.LinkedList;
 
 
 public class Triangle {
@@ -9,6 +10,9 @@ public class Triangle {
     int size;
     int id;
     Color color;
+    
+    LinkedList<Piece> pieces = new LinkedList<>();
+    
     public Triangle(){
         
     }
@@ -20,4 +24,5 @@ public class Triangle {
         this.id = id;
         this.color = color;
     }
+    
 }
