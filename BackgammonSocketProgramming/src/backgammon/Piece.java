@@ -14,4 +14,9 @@ public class Piece {
         this.r = r;
         this.color = color;
     }
+    
+    public void setCoordinate(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
 }
