@@ -8,6 +8,7 @@ public class Triangle {
     int[] x;
     int[] y;
     int id;
+    int width;
     Color color;
     
     LinkedList<Piece> pieces = new LinkedList<>();
@@ -21,6 +22,7 @@ public class Triangle {
         this.y = y;
         this.id = id;
         this.color = color;
+        this.width = x[2] - x[0];
     }
     
     public void add(Piece p){
