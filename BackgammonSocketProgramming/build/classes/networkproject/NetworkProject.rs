@@ -1,2 +1,0 @@
-networkproject.Panel
-networkproject.NetworkProject

@@ -1,2 +1,0 @@
-backgammon.Backgammon
-backgammon.Panel

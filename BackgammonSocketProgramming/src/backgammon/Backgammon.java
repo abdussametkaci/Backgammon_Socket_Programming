@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 
 public class Backgammon {
 
+    static Color CurrentPlayer = Color.YELLOW;
+
     static int actualWidth = 1000;
     static int actualHeight = 450;
     static int extraWidth = 18;
@@ -39,6 +41,8 @@ public class Backgammon {
 
     static int dice1 = 1;
     static int dice2 = 1;
+    static int play = 0;    // each players can play 2, if dices are same, they can play 4
+    static boolean playDice = false;
 
     public static void main(String[] args) {
         JFrame jFrame = new JFrame();
@@ -107,7 +111,7 @@ public class Backgammon {
                     g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
                     g.drawString("" + bar.sizeYellow(), bar.x + pieceR / 2, bar.y + pieceR / 2);
                 }
-                
+
                 if (bar.sizeBlue() > 0) {
                     g.setColor(Color.GREEN);
                     g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
@@ -121,21 +125,54 @@ public class Backgammon {
         jFrame.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
+                /*
+                if(bar.hasPiece(CurrentPlayer)){
+                    if(triangles.get(dice1).pieces.getLast()){
+                        
+                    }
+                }
+                 */
+                if (!playDice) {
+                    return;
+                }
                 for (Triangle t : triangles) {
 
                     if ((t.x[0] <= X && t.x[2] >= X && t.y[1] >= Y && t.y[0] <= Y) || (t.x[0] <= X && t.x[2] >= X && t.y[1] <= Y && t.y[0] >= Y)) {
                         System.out.println(t.id);
                         try {
-                            selectedPiece = t.pieces.removeLast();
-                            target_triangle = triangles.get((t.id + 1) % 24);
-                            if (target_triangle.size() > 0) {
-                                if (target_triangle.getLast().color != selectedPiece.color) {
-                                    Piece p = target_triangle.remove();
-                                    bar.add(p);
-                                }
+                            selectedPiece = t.pieces.getLast();
+                            if (selectedPiece.color != CurrentPlayer) {
+                                return;
                             }
 
+                            play++;
+                            if (play == 1) {
+                                target_triangle = triangles.get((t.id + dice1) % 24);
+                            } else if (play <= 4) {
+                                target_triangle = triangles.get((t.id + dice2) % 24);
+                            }
+
+                            if (target_triangle.size() == 1 && target_triangle.getLast().color != selectedPiece.color) {
+                                Piece p = target_triangle.remove();
+                                bar.add(p);
+                            } else if (target_triangle.size() > 1 && target_triangle.getLast().color != selectedPiece.color) {
+                                play--;
+                                return;
+                            }
+
+                            selectedPiece = t.pieces.removeLast();
                             target_triangle.add(selectedPiece);
+                            System.out.println("player: " + CurrentPlayer + ", play: " + play);
+                            if ((dice1 == dice2 && play == 4) || (dice1 != dice2 && play == 2)) {
+                                // change next player
+                                if (CurrentPlayer == Color.YELLOW) {
+                                    CurrentPlayer = Color.BLUE;
+                                } else {
+                                    CurrentPlayer = Color.YELLOW;
+                                }
+                                play = 0;
+                                playDice = false;
+                            }
                             break;
                         } catch (NoSuchElementException e) {
 
@@ -144,6 +181,7 @@ public class Backgammon {
                     }
 
                 }
+
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
             }
 
@@ -184,6 +222,8 @@ public class Backgammon {
                 dice2 = random.nextInt(6) + 1;
                 System.out.println("dice1: " + dice1 + ", dice2: " + dice2);
                 //jPanel.paint(grphcs);
+                playDice = true;
+                System.out.println("current player: " + CurrentPlayer);
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
 
             }
@@ -276,54 +316,6 @@ public class Backgammon {
             }
         }
 
-        /*
-        Triangle t = (Triangle) list.get(0);
-        
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0 + pieceR, pieceR, Color.yellow));
-
-        t = (Triangle) list.get(5);
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 60, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 120, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 180, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 240, pieceR, Color.blue));
-
-        t = (Triangle) list.get(7);
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 60, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 120, pieceR, Color.blue));
-
-        t = (Triangle) list.get(11);
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 60, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 120, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 180, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 240, pieceR, Color.yellow));
-
-        t = (Triangle) list.get(12);
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 60, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 120, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 180, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 240, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 300, pieceR, Color.blue));
-
-        t = (Triangle) list.get(16);
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 60, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 120, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 180, pieceR, Color.yellow));
-
-        t = (Triangle) list.get(18);
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 60, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 120, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 180, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 240, pieceR, Color.yellow));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 300, pieceR, Color.yellow));
-
-        t = (Triangle) list.get(23);
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 60, pieceR, Color.blue));
-        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 120, pieceR, Color.blue));
-         */
     }
 
 }
