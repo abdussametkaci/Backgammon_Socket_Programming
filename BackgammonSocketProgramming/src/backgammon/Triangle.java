@@ -40,6 +40,14 @@ public class Triangle {
         
     }
     
+    public Piece getLast() {
+        return pieces.getLast();
+    }
+    
+    public Piece remove(){
+        return pieces.removeLast();
+    }
+    
     public int size(){
         return pieces.size();
     }

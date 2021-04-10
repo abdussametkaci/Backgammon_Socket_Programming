@@ -40,8 +40,6 @@ public class Backgammon {
     static int dice1 = 1;
     static int dice2 = 1;
 
-    static int diece = 0;
-
     public static void main(String[] args) {
         JFrame jFrame = new JFrame();
         jFrame.setSize(actualWidth + extraWidth, actualHeight + extraHeight); // width + 18, height + 43
@@ -50,6 +48,9 @@ public class Backgammon {
 
         LinkedList<Triangle> triangles = new LinkedList<>();
         addElements(triangles);
+
+        Bar bar = new Bar();
+        bar.setBounds(6 * triangleW, 0, middleBar, actualHeight);
 
         JPanel jPanel = new JPanel() {
             @Override
@@ -65,16 +66,16 @@ public class Backgammon {
                 }
 
                 g.setColor(Color.LIGHT_GRAY);
-                g.fillRect(6 * triangleW, 0, middleBar, actualHeight);
+                g.fillRect(bar.x, bar.y, bar.width, bar.height);
 
                 for (Triangle t : triangles) {
                     if (t.size() > 5) {
                         g.setColor(Color.GREEN);
                         g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
                         if (t.id < 12) {
-                            g.drawString("+" + t.size(), t.x[0] + selectedPiece.r / 3, t.y[1] - selectedPiece.r / 3);
+                            g.drawString("" + t.size(), t.x[0] + selectedPiece.r / 2, t.y[1] - selectedPiece.r / 3);
                         } else {
-                            g.drawString("+" + t.size(), t.x[0] + selectedPiece.r / 3, t.y[1] + selectedPiece.r / 2);
+                            g.drawString("" + t.size(), t.x[0] + selectedPiece.r / 2, t.y[1] + selectedPiece.r / 2);
                         }
                     }
                 }
@@ -91,6 +92,28 @@ public class Backgammon {
                 g.drawImage(image, 6 * triangleW, actualHeight / 2 - middleBar, this);
                 g.drawImage(image2, 6 * triangleW, actualHeight / 2, this);
 
+                for (Piece p : bar.piecesYellow) {
+                    g.setColor(p.color);
+                    g.fillOval(p.x, p.y, p.r, p.r);
+                }
+
+                for (Piece p : bar.piecesBlue) {
+                    g.setColor(p.color);
+                    g.fillOval(p.x, p.y, p.r, p.r);
+                }
+
+                if (bar.sizeYellow() > 0) {
+                    g.setColor(Color.GREEN);
+                    g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+                    g.drawString("" + bar.sizeYellow(), bar.x + pieceR / 2, bar.y + pieceR / 2);
+                }
+                
+                if (bar.sizeBlue() > 0) {
+                    g.setColor(Color.GREEN);
+                    g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+                    g.drawString("" + bar.sizeBlue(), bar.x + pieceR / 2, bar.height - pieceR / 2);
+                }
+
             }
 
         };
@@ -105,6 +128,13 @@ public class Backgammon {
                         try {
                             selectedPiece = t.pieces.removeLast();
                             target_triangle = triangles.get((t.id + 1) % 24);
+                            if (target_triangle.size() > 0) {
+                                if (target_triangle.getLast().color != selectedPiece.color) {
+                                    Piece p = target_triangle.remove();
+                                    bar.add(p);
+                                }
+                            }
+
                             target_triangle.add(selectedPiece);
                             break;
                         } catch (NoSuchElementException e) {
@@ -155,7 +185,7 @@ public class Backgammon {
                 System.out.println("dice1: " + dice1 + ", dice2: " + dice2);
                 //jPanel.paint(grphcs);
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
-               
+
             }
         });
 
