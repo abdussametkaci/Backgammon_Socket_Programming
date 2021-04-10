@@ -2,193 +2,298 @@ package backgammon;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import javax.swing.*;
+import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Polygon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-public class Backgammon extends JFrame {
-    
-    static int extraWidth = 0;
-    static int extraHeight = 0;
-    
-    public Backgammon() {
-        add(new Panel());
-    }
+public class Backgammon {
+
+    static int actualWidth = 1000;
+    static int actualHeight = 450;
+    static int extraWidth = 18;
+    static int extraHeight = 43;
+
+    static Piece selectedPiece = null;
+    static Triangle target_triangle = null;
+
+    static int X;
+    static int Y;
+
+    static int pieceR = 40; // radius
+    static int triangleW = 60; // triangle width
+    static int triangleH = 5 * pieceR; // triangle height
+    static int middleBar = 50 * (triangleW / 60);
+
+    static int dice1 = 1;
+    static int dice2 = 1;
+
+    static int diece = 0;
 
     public static void main(String[] args) {
-        Backgammon frame = new Backgammon();
-        frame.setTitle("Figuras1");
-        frame.setSize(1500, 650);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        JFrame jFrame = new JFrame();
+        jFrame.setSize(actualWidth + extraWidth, actualHeight + extraHeight); // width + 18, height + 43
+        jFrame.setTitle("Backgammon");
+        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        LinkedList<Triangle> triangles = new LinkedList<>();
+        addElements(triangles);
+
+        JPanel jPanel = new JPanel() {
+            @Override
+            public void paint(Graphics g) {
+                for (Triangle t : triangles) {
+                    g.setColor(t.color);
+                    g.fillPolygon(t.x, t.y, 3);
+
+                    for (Piece p : t.pieces) {
+                        g.setColor(p.color);
+                        g.fillOval(p.x, p.y, p.r, p.r);
+                    }
+                }
+
+                g.setColor(Color.LIGHT_GRAY);
+                g.fillRect(6 * triangleW, 0, middleBar, actualHeight);
+
+                for (Triangle t : triangles) {
+                    if (t.size() > 5) {
+                        g.setColor(Color.GREEN);
+                        g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+                        if (t.id < 12) {
+                            g.drawString("+" + t.size(), t.x[0] + selectedPiece.r / 3, t.y[1] - selectedPiece.r / 3);
+                        } else {
+                            g.drawString("+" + t.size(), t.x[0] + selectedPiece.r / 3, t.y[1] + selectedPiece.r / 2);
+                        }
+                    }
+                }
+
+                BufferedImage image = null;
+                BufferedImage image2 = null;
+                try {
+                    image = ImageIO.read(new File("./src/image/" + dice1 + ".png"));
+                    image2 = ImageIO.read(new File("./src/image/" + dice2 + ".png"));
+
+                } catch (IOException ex) {
+
+                }
+                g.drawImage(image, 6 * triangleW, actualHeight / 2 - middleBar, this);
+                g.drawImage(image2, 6 * triangleW, actualHeight / 2, this);
+
+            }
+
+        };
+
+        jFrame.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                for (Triangle t : triangles) {
+
+                    if ((t.x[0] <= X && t.x[2] >= X && t.y[1] >= Y && t.y[0] <= Y) || (t.x[0] <= X && t.x[2] >= X && t.y[1] <= Y && t.y[0] >= Y)) {
+                        System.out.println(t.id);
+                        try {
+                            selectedPiece = t.pieces.removeLast();
+                            target_triangle = triangles.get((t.id + 1) % 24);
+                            target_triangle.add(selectedPiece);
+                            break;
+                        } catch (NoSuchElementException e) {
+
+                        }
+
+                    }
+
+                }
+                jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+                X = me.getX() - extraWidth < 0 ? 0 : me.getX() - extraWidth;
+                Y = me.getY() - extraHeight < 0 ? 0 : me.getY() - extraHeight;
+                // System.out.println("X: " + X + ", Y:" + Y);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent me) {
+                // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent me) {
+                // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void mouseExited(MouseEvent me) {
+                // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+        });
+
+        JButton jButton = new JButton("Dice");
+        jButton.setSize(70, 30);
+        jButton.setLocation(800, 0);
+
+        jButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                Random random = new Random();
+                dice1 = random.nextInt(6) + 1; // [1..6]
+                dice2 = random.nextInt(6) + 1;
+                System.out.println("dice1: " + dice1 + ", dice2: " + dice2);
+                //jPanel.paint(grphcs);
+                jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
+               
+            }
+        });
+
+        jPanel.setLayout(null);
+        jFrame.add(jButton);
+        jFrame.add(jPanel);
+        jFrame.setVisible(true);
+
+        /*
         // get actual size
-        Dimension actualSize = frame.getContentPane().getSize();
-        extraHeight = actualSize.height;
-        extraWidth = actualSize.width;
-    }
-}
+        Dimension actualSize = jFrame.getContentPane().getSize();
+        actualWidth = actualSize.width;
+        actualHeight = actualSize.height;
 
-class Panel extends JPanel {
+        extraWidth = jFrame.getWidth() - actualWidth;
+        extraHeight = jFrame.getHeight() - actualHeight;
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        //marco del tablero
-        g.setColor(Color.orange);
-        g.fillRect(0, 0, 700, 553);
-        g.setColor(Color.black);
-        g.fillRect(30, 30, 620, 505);
-        g.setColor(Color.orange);
-        g.fillRect(330, 0, 20, 553);
-
-        // triangulos abajo izquierda
-        g.setColor(Color.RED);
-        int valoresX[] = {55, 30, 80};
-        int valoresY[] = {300, 535, 535};
-        Polygon poligono1 = new Polygon(valoresX, valoresY, 3);
-        g.fillPolygon(poligono1);
-
-        g.setColor(Color.white);
-        int valoresX2[] = {105, 80, 130};
-        int valoresY2[] = {300, 535, 535};
-        Polygon poligono2 = new Polygon(valoresX2, valoresY2, 3);
-        g.fillPolygon(poligono2);
-
-        g.setColor(Color.red);
-        int valoresX3[] = {155, 130, 180};
-        int valoresY3[] = {300, 535, 535};
-        Polygon poligono3 = new Polygon(valoresX3, valoresY3, 3);
-        g.fillPolygon(poligono3);
-
-        g.setColor(Color.white);
-        int valoresX4[] = {205, 180, 230};
-        int valoresY4[] = {300, 535, 535};
-        Polygon poligono4 = new Polygon(valoresX4, valoresY4, 3);
-        g.fillPolygon(poligono4);
-
-        g.setColor(Color.red);
-        int valoresX5[] = {255, 230, 280};
-        int valoresY5[] = {300, 535, 535};
-        Polygon poligono5 = new Polygon(valoresX5, valoresY5, 3);
-        g.fillPolygon(poligono5);
-
-        g.setColor(Color.white);
-        int valoresX6[] = {305, 280, 330};
-        int valoresY6[] = {300, 535, 535};
-        Polygon poligono6 = new Polygon(valoresX6, valoresY6, 3);
-        g.fillPolygon(poligono6);
-
-        //triangulos abajo derecha 
-        g.setColor(Color.RED);
-        int valoresX7[] = {375, 350, 400};
-        int valoresY7[] = {300, 535, 535};
-        Polygon poligono7 = new Polygon(valoresX7, valoresY7, 3);
-        g.fillPolygon(poligono7);
-
-        g.setColor(Color.white);
-        int valoresX8[] = {425, 400, 450};
-        int valoresY8[] = {300, 535, 535};
-        Polygon poligono8 = new Polygon(valoresX8, valoresY8, 3);
-        g.fillPolygon(poligono8);
-
-        g.setColor(Color.red);
-        int valoresX9[] = {475, 450, 500};
-        int valoresY9[] = {300, 535, 535};
-        Polygon poligono9 = new Polygon(valoresX9, valoresY9, 3);
-        g.fillPolygon(poligono9);
-
-        g.setColor(Color.white);
-        int valoresXa[] = {525, 500, 550};
-        int valoresYa[] = {300, 535, 535};
-        Polygon poligonoa = new Polygon(valoresXa, valoresYa, 3);
-        g.fillPolygon(poligonoa);
-
-        g.setColor(Color.red);
-        int valoresXb[] = {575, 550, 600};
-        int valoresYb[] = {300, 535, 535};
-        Polygon poligonob = new Polygon(valoresXb, valoresYb, 3);
-        g.fillPolygon(poligonob);
-
-        g.setColor(Color.white);
-        int valoresXc[] = {625, 600, 650};
-        int valoresYc[] = {300, 535, 535};
-        Polygon poligonoc = new Polygon(valoresXc, valoresYc, 3);
-        g.fillPolygon(poligonoc);
-
-        //tringulos arriba izquierda 
-        g.setColor(Color.white);
-        int valoresXd[] = {55, 30, 80};
-        int valoresYd[] = {250, 30, 30};
-        Polygon poligonod = new Polygon(valoresXd, valoresYd, 3);
-        g.fillPolygon(poligonod);
-
-        g.setColor(Color.red);
-        int valoresXe[] = {105, 80, 130};
-        int valoresYe[] = {250, 30, 30};
-        Polygon poligonoe = new Polygon(valoresXe, valoresYe, 3);
-        g.fillPolygon(poligonoe);
-
-        g.setColor(Color.white);
-        int valoresXf[] = {155, 130, 180};
-        int valoresYf[] = {250, 30, 30};
-        Polygon poligonof = new Polygon(valoresXf, valoresYf, 3);
-        g.fillPolygon(poligonof);
-
-        g.setColor(Color.red);
-        int valoresXg[] = {205, 180, 230};
-        int valoresYg[] = {250, 30, 30};
-        Polygon poligonog = new Polygon(valoresXg, valoresYg, 3);
-        g.fillPolygon(poligonog);
-
-        g.setColor(Color.white);
-        int valoresXh[] = {255, 230, 280};
-        int valoresYh[] = {250, 30, 30};
-        Polygon poligonoh = new Polygon(valoresXh, valoresYh, 3);
-        g.fillPolygon(poligonoh);
-
-        g.setColor(Color.red);
-        int valoresXi[] = {305, 280, 330};
-        int valoresYi[] = {250, 30, 30};
-        Polygon poligonoi = new Polygon(valoresXi, valoresYi, 3);
-        g.fillPolygon(poligonoi);
-
-        //triangulos arriba derecha
-        g.setColor(Color.white);
-        int valoresXj[] = {375, 350, 400};
-        int valoresYj[] = {250, 30, 30};
-        Polygon poligonoj = new Polygon(valoresXj, valoresYj, 3);
-        g.fillPolygon(poligonoj);
-
-        g.setColor(Color.red);
-        int valoresXk[] = {425, 400, 450};
-        int valoresYk[] = {250, 30, 30};
-        Polygon poligonok = new Polygon(valoresXk, valoresYk, 3);
-        g.fillPolygon(poligonok);
-
-        g.setColor(Color.white);
-        int valoresXl[] = {475, 450, 500};
-        int valoresYl[] = {250, 30, 30};
-        Polygon poligonol = new Polygon(valoresXl, valoresYl, 3);
-        g.fillPolygon(poligonol);
-
-        g.setColor(Color.red);
-        int valoresXm[] = {525, 500, 550};
-        int valoresYm[] = {250, 30, 30};
-        Polygon poligonom = new Polygon(valoresXm, valoresYm, 3);
-        g.fillPolygon(poligonom);
-
-        g.setColor(Color.white);
-        int valoresXn[] = {575, 550, 600};
-        int valoresYn[] = {250, 30, 30};
-        Polygon poligonon = new Polygon(valoresXn, valoresYn, 3);
-        g.fillPolygon(poligonon);
-
-        g.setColor(Color.red);
-        int valoresXo[] = {625, 600, 650};
-        int valoresYo[] = {250, 30, 30};
-        Polygon poligonoo = new Polygon(valoresXo, valoresYo, 3);
-        g.fillPolygon(poligonoo);
+        System.out.println("actual width: " + actualWidth + " , actual height: " + actualHeight);
+        System.out.println("width: " + jFrame.getWidth() + " , height: " + jFrame.getHeight());
+         */
+        for (Triangle t : triangles) {
+            System.out.println("id: " + t.id + ", width: " + t.width);
+        }
 
     }
+
+    static void addElements(LinkedList list) {
+        Color color = null;
+        int partLenght = 6 * triangleW + middleBar;
+        // Section 1
+        for (int i = 6; i >= 1; i--) {
+            if (i % 2 == 0) {
+                color = Color.BLACK;
+            } else {
+                color = Color.RED;
+            }
+            list.add(new Triangle(new int[]{partLenght + (i - 1) * triangleW, partLenght + (triangleW / 2) + triangleW * (i - 1), partLenght + i * triangleW}, new int[]{0, triangleH, 0}, 6 - i, color));
+        }
+
+        // Section 2
+        for (int i = 6; i >= 1; i--) {
+            if (i % 2 == 0) {
+                color = Color.BLACK;
+            } else {
+                color = Color.RED;
+            }
+            list.add(new Triangle(new int[]{(i - 1) * triangleW, (triangleW / 2) + triangleW * (i - 1), i * triangleW}, new int[]{0, triangleH, 0}, 12 - i, color));
+        }
+
+        // Section 3
+        for (int i = 1; i <= 6; i++) {
+            if (i % 2 == 0) {
+                color = Color.RED;
+            } else {
+                color = Color.BLACK;
+            }
+            list.add(new Triangle(new int[]{(i - 1) * triangleW, (triangleW / 2) + triangleW * (i - 1), i * triangleW}, new int[]{actualHeight, actualHeight - triangleH, actualHeight}, i + 11, color));
+        }
+
+        // Section 4
+        for (int i = 1; i <= 6; i++) {
+            if (i % 2 == 0) {
+                color = Color.RED;
+            } else {
+                color = Color.BLACK;
+            }
+            list.add(new Triangle(new int[]{partLenght + (i - 1) * triangleW, partLenght + (triangleW / 2) + triangleW * (i - 1), partLenght + i * triangleW}, new int[]{actualHeight, actualHeight - triangleH, actualHeight}, i + 17, color));
+        }
+
+        // Add Pieces
+        int[] count = {2, 5, 3, 5, 5, 3, 5, 2};
+        Color[] pieceColor = {Color.yellow, Color.blue, Color.blue, Color.yellow, Color.blue, Color.yellow, Color.yellow, Color.blue};
+        int j = 0;
+        Triangle t = null;
+        for (int i = 0; i < 24; i++) { // in the 8 part, there are pieces
+            if (i == 0 || i == 5 || i == 7 || i == 11) {
+                t = (Triangle) list.get(i);
+                for (int k = 0; k < count[j]; k++) {
+                    t.pieces.add(new Piece(t.x[0] + ((triangleW - pieceR) / 2), 0 + (k * pieceR), pieceR, pieceColor[j]));
+                }
+                j++;
+            } else if (i == 12 || i == 16 || i == 18 || i == 23) {
+                t = (Triangle) list.get(i);
+                for (int k = 1; k <= count[j]; k++) {
+                    t.pieces.add(new Piece(t.x[0] + ((triangleW - pieceR) / 2), actualHeight - (k * pieceR), pieceR, pieceColor[j]));
+                }
+                j++;
+            }
+        }
+
+        /*
+        Triangle t = (Triangle) list.get(0);
+        
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0 + pieceR, pieceR, Color.yellow));
+
+        t = (Triangle) list.get(5);
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 60, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 120, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 180, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 240, pieceR, Color.blue));
+
+        t = (Triangle) list.get(7);
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 60, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 120, pieceR, Color.blue));
+
+        t = (Triangle) list.get(11);
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 0, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 60, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 120, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 180, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), 240, pieceR, Color.yellow));
+
+        t = (Triangle) list.get(12);
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 60, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 120, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 180, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 240, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 300, pieceR, Color.blue));
+
+        t = (Triangle) list.get(16);
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 60, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 120, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 180, pieceR, Color.yellow));
+
+        t = (Triangle) list.get(18);
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 60, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 120, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 180, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 240, pieceR, Color.yellow));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 300, pieceR, Color.yellow));
+
+        t = (Triangle) list.get(23);
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 60, pieceR, Color.blue));
+        t.pieces.add(new Piece(t.x[0] + ((triangleW-pieceR)/2), actualHeight - 120, pieceR, Color.blue));
+         */
+    }
+
 }
