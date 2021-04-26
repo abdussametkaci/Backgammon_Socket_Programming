@@ -42,7 +42,8 @@ public class Backgammon {
     static int dice1 = 1;
     static int dice2 = 1;
     static int play = 0;    // each players can play 2, if dices are same, they can play 4
-    static boolean playDice = false;
+    static boolean playDice = false;   // zar atıldı mı
+    static int[] steps = {0, 0, 0, 0};
 
     public static void main(String[] args) {
         JFrame jFrame = new JFrame();
@@ -125,61 +126,179 @@ public class Backgammon {
         jFrame.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
-                /*
-                if(bar.hasPiece(CurrentPlayer)){
-                    if(triangles.get(dice1).pieces.getLast()){
-                        
-                    }
-                }
-                 */
+
                 if (!playDice) {
                     return;
                 }
-                for (Triangle t : triangles) {
 
-                    if ((t.x[0] <= X && t.x[2] >= X && t.y[1] >= Y && t.y[0] <= Y) || (t.x[0] <= X && t.x[2] >= X && t.y[1] <= Y && t.y[0] >= Y)) {
-                        System.out.println(t.id);
-                        try {
-                            selectedPiece = t.pieces.getLast();
-                            if (selectedPiece.color != CurrentPlayer) {
-                                return;
-                            }
-
-                            play++;
-                            if (play == 1) {
-                                target_triangle = triangles.get((t.id + dice1) % 24);
-                            } else if (play <= 4) {
-                                target_triangle = triangles.get((t.id + dice2) % 24);
-                            }
-
-                            if (target_triangle.size() == 1 && target_triangle.getLast().color != selectedPiece.color) {
-                                Piece p = target_triangle.remove();
-                                bar.add(p);
-                            } else if (target_triangle.size() > 1 && target_triangle.getLast().color != selectedPiece.color) {
-                                play--;
-                                return;
-                            }
-
-                            selectedPiece = t.pieces.removeLast();
-                            target_triangle.add(selectedPiece);
-                            System.out.println("player: " + CurrentPlayer + ", play: " + play);
-                            if ((dice1 == dice2 && play == 4) || (dice1 != dice2 && play == 2)) {
-                                // change next player
-                                if (CurrentPlayer == Color.YELLOW) {
-                                    CurrentPlayer = Color.BLUE;
+                if (bar.hasPiece(CurrentPlayer)) {
+                    System.out.println("bar");
+                    if (bar.x <= X && bar.x + bar.width >= X) {
+                        boolean played = false;
+                        play++;
+                        if (play == 1) {
+                            /*
+                            if (triangles.get(dice1 - 1).pieces.isEmpty()) {
+                                if (CurrentPlayer == Color.BLUE) {
+                                    target_triangle = triangles.get(24 - dice1);
+                                    target_triangle.add(bar.remove(CurrentPlayer));
                                 } else {
-                                    CurrentPlayer = Color.YELLOW;
+                                    target_triangle = triangles.get(dice1 - 1);
+                                    target_triangle.add(bar.remove(CurrentPlayer));
                                 }
-                                play = 0;
-                                playDice = false;
+                            } else if (triangles.get(dice1 - 1).pieces.size() == 1) {
+                                Piece p = bar.remove(CurrentPlayer);
+                                if (CurrentPlayer == Color.BLUE) {
+                                    target_triangle = triangles.get(24 - dice1);
+                                } else {
+                                    target_triangle = triangles.get(dice1 - 1);
+                                }
+                                bar.add(target_triangle.remove());
+                                target_triangle.add(p);
+
                             }
-                            break;
-                        } catch (NoSuchElementException e) {
+                             */
+
+                            if (CurrentPlayer == Color.BLUE) {
+                                if (triangles.get(24 - dice1).pieces.isEmpty()) {
+                                    target_triangle = triangles.get(24 - dice1);
+                                    target_triangle.add(bar.remove(CurrentPlayer));
+                                } else if (triangles.get(24 - dice1).pieces.size() == 1) {
+                                    Piece p = bar.remove(CurrentPlayer);
+                                    target_triangle = triangles.get(24 - dice1);
+                                    bar.add(target_triangle.remove());
+                                    target_triangle.add(p);
+                                }
+
+                            } else {
+                                if (triangles.get(dice1 - 1).pieces.isEmpty()) {
+                                    target_triangle = triangles.get(dice1 - 1);
+                                    target_triangle.add(bar.remove(CurrentPlayer));
+                                } else if (triangles.get(dice1 - 1).pieces.size() == 1) {
+                                    Piece p = bar.remove(CurrentPlayer);
+                                    target_triangle = triangles.get(dice1 - 1);
+                                    bar.add(target_triangle.remove());
+                                    target_triangle.add(p);
+                                }
+                            }
+
+                        } else if (play <= 4) {
+                            /*
+                            if (triangles.get(dice2 - 1).pieces.isEmpty()) {
+                                if (CurrentPlayer == Color.BLUE) {
+                                    target_triangle = triangles.get(24 - dice2);
+                                    target_triangle.add(bar.remove(CurrentPlayer));
+                                } else {
+                                    target_triangle = triangles.get(dice2 - 1);
+                                    target_triangle.add(bar.remove(CurrentPlayer));
+                                }
+                            } else if (triangles.get(dice2 - 1).pieces.size() == 1) {
+                                Piece p = bar.remove(CurrentPlayer);
+                                if (CurrentPlayer == Color.BLUE) {
+                                    target_triangle = triangles.get(24 - dice2);
+                                } else {
+                                    target_triangle = triangles.get(dice2 - 1);
+                                }
+                                bar.add(target_triangle.remove());
+                                target_triangle.add(p);
+
+                            }
+                             */
+
+                            if (CurrentPlayer == Color.BLUE) {
+                                if (triangles.get(24 - dice2).pieces.isEmpty()) {
+                                    target_triangle = triangles.get(24 - dice2);
+                                    target_triangle.add(bar.remove(CurrentPlayer));
+                                } else if (triangles.get(24 - dice2).pieces.size() == 1) {
+                                    Piece p = bar.remove(CurrentPlayer);
+                                    target_triangle = triangles.get(24 - dice2);
+                                    bar.add(target_triangle.remove());
+                                    target_triangle.add(p);
+                                }
+
+                            } else {
+                                if (triangles.get(dice2 - 1).pieces.isEmpty()) {
+                                    target_triangle = triangles.get(dice2 - 1);
+                                    target_triangle.add(bar.remove(CurrentPlayer));
+                                } else if (triangles.get(dice2 - 1).pieces.size() == 1) {
+                                    Piece p = bar.remove(CurrentPlayer);
+                                    target_triangle = triangles.get(dice2 - 1);
+                                    bar.add(target_triangle.remove());
+                                    target_triangle.add(p);
+                                }
+                            }
+
+                            played = true;
+                        }
+
+                        if ((dice1 == dice2 && play >= 4) || (dice1 != dice2 && play >= 2) || (!played)) {
+                            // change next player
+                            if (CurrentPlayer == Color.YELLOW) {
+                                CurrentPlayer = Color.BLUE;
+                            } else {
+                                CurrentPlayer = Color.YELLOW;
+                            }
+                            play = 0;
+                            playDice = false;
+                        }
+
+                    }
+                } else {
+
+                    for (Triangle t : triangles) {
+
+                        if ((t.x[0] <= X && t.x[2] >= X && t.y[1] >= Y && t.y[0] <= Y) || (t.x[0] <= X && t.x[2] >= X && t.y[1] <= Y && t.y[0] >= Y)) {
+                            System.out.println(t.id);
+                            try {
+                                selectedPiece = t.pieces.getLast();
+                                if (selectedPiece.color != CurrentPlayer) {
+                                    return;
+                                }
+
+                                play++;
+                                if (play == 1) {
+                                    if (CurrentPlayer == Color.YELLOW) {
+                                        target_triangle = triangles.get((t.id + dice1) % 24);
+                                    } else {
+                                        target_triangle = triangles.get((t.id - dice1) % 24);
+                                    }
+                                } else if (play <= 4) {
+                                    if (CurrentPlayer == Color.YELLOW) {
+                                        target_triangle = triangles.get((t.id + dice2) % 24);
+                                    } else {
+                                        target_triangle = triangles.get((t.id - dice2) % 24);
+                                    }
+                                }
+
+                                if (target_triangle.size() == 1 && target_triangle.getLast().color != selectedPiece.color) {
+                                    Piece p = target_triangle.remove();
+                                    bar.add(p);
+                                } else if (target_triangle.size() > 1 && target_triangle.getLast().color != selectedPiece.color) {
+                                    play--;
+                                    return;
+                                }
+
+                                selectedPiece = t.pieces.removeLast();
+                                target_triangle.add(selectedPiece);
+                                System.out.println("player: " + CurrentPlayer + ", play: " + play);
+                                if ((dice1 == dice2 && play >= 4) || (dice1 != dice2 && play >= 2)) {
+                                    // change next player
+                                    if (CurrentPlayer == Color.YELLOW) {
+                                        CurrentPlayer = Color.BLUE;
+                                    } else {
+                                        CurrentPlayer = Color.YELLOW;
+                                    }
+                                    play = 0;
+                                    playDice = false;
+                                }
+                                break;
+                            } catch (NoSuchElementException e) {
+
+                            }
 
                         }
 
                     }
-
                 }
 
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
@@ -220,7 +339,16 @@ public class Backgammon {
                 Random random = new Random();
                 dice1 = random.nextInt(6) + 1; // [1..6]
                 dice2 = random.nextInt(6) + 1;
+                steps[0] = dice1;
+                steps[1] = dice2;
                 System.out.println("dice1: " + dice1 + ", dice2: " + dice2);
+                if (dice1 == dice2) {
+                    steps[2] = dice2;
+                    steps[3] = dice2;
+                } else {
+                    steps[2] = 0;
+                    steps[3] = 0;
+                }
                 //jPanel.paint(grphcs);
                 playDice = true;
                 System.out.println("current player: " + CurrentPlayer);
@@ -316,6 +444,18 @@ public class Backgammon {
             }
         }
 
+    }
+
+    static int nextStep(int[] diceSteps, int j) {
+        diceSteps[j] = 0;
+        int dice = 0;
+        for (int i = 0; i < diceSteps.length; i++) {
+            if (diceSteps[i] != 0) {
+                dice = diceSteps[i];
+                break;
+            }
+        }
+        return dice;
     }
 
 }
