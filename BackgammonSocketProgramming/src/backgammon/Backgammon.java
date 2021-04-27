@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import Client.Client;
+import Message.Message;
 
 public class Backgammon {
 
@@ -30,10 +31,10 @@ public class Backgammon {
 
     Color CurrentPlayer = Color.YELLOW;
 
-    int actualWidth = 1000;
-    int actualHeight = 450;
-    int extraWidth = 18;
-    int extraHeight = 43;
+    static int actualWidth = 1000;
+    static int actualHeight = 450;
+    static int extraWidth = 18;
+    static int extraHeight = 43;
 
     Piece selectedPiece = null;
     Triangle target_triangle = null;
@@ -41,20 +42,20 @@ public class Backgammon {
     int X;
     int Y;
 
-    int pieceR = 40; // radius
-    int triangleW = 60; // triangle width
-    int triangleH = 5 * pieceR; // triangle height
-    int middleBar = 50 * (triangleW / 60);
+    static int pieceR = 40; // radius
+    static int triangleW = 60; // triangle width
+    static int triangleH = 5 * pieceR; // triangle height
+    static int middleBar = 50 * (triangleW / 60);
 
-    int dice1 = 1;
-    int dice2 = 1;
+    static int dice1 = 1;
+    static int dice2 = 1;
     int play = 0;    // each players can play 2, if dices are same, they can play 4
     boolean playDice = false;   // zar atıldı mı
     int[] steps = {0, 0, 0, 0};
-
+    static JFrame jFrame;
     public Backgammon() {
         ThisGame = this;
-        JFrame jFrame = new JFrame();
+        jFrame = new JFrame();
         jFrame.setSize(actualWidth + extraWidth, actualHeight + extraHeight); // width + 18, height + 43
         jFrame.setTitle("Backgammon");
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -320,6 +321,13 @@ public class Backgammon {
                 System.out.println("current player: " + CurrentPlayer);
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
 
+                // her zar attiginda mesaj atar
+                Message msg = new Message(Message.Message_Type.Text);
+                //msg.content = "dice1: " + dice1 + ", dice2: " + dice2;
+                int dices[] = {dice1, dice2};
+                msg.content = dices;
+                Client.Send(msg);
+
             }
         });
 
@@ -438,6 +446,15 @@ public class Backgammon {
         }
         return dice;
     }
+    
+   public static void repaint(){
+         jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
+    }
+   
+   public static void setDices(int d1, int d2){
+       dice1 = d1;
+       dice2 = d2;
+   }
 
     public static void main(String[] args) {
         new Backgammon();

@@ -7,6 +7,7 @@ package Server;
 
 import Message.Message;
 import static Message.Message.Message_Type.Selected;
+import backgammon.Backgammon;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -81,7 +82,7 @@ public class SClient {
                     //mesaj tipine göre işlemlere ayır
                     switch (received.type) {
                         case Name:
-                            TheClient.name = received.content.toString();
+                            //TheClient.name = received.content.toString();
                             // isim verisini gönderdikten sonra eşleştirme işlemine başla
                             TheClient.pairThread.start();
                             break;
@@ -93,6 +94,7 @@ public class SClient {
                         case Text:
                             //gelen metni direkt rakibe gönder
                             Server.Send(TheClient.rival, received);
+                            //Backgammon.repaint();
                             break;
                         case Selected:
                             //gelen seçim yapıldı mesajını rakibe gönder

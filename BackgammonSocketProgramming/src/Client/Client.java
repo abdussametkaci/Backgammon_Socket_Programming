@@ -47,6 +47,10 @@ class Listen extends Thread {
                         break;
                     case Text:
                         //Backgammon.ThisGame.txt_receive.setText(received.content.toString());
+                        int[] recv = (int[])received.content;
+                        System.out.println("dice1: " + recv[0] + ", dice2: " + recv[1]);
+                        Backgammon.setDices(recv[0], recv[1]);
+                        Backgammon.repaint();
                         break;
                     case Selected:
                         Backgammon.ThisGame.RivalSelection = (int) received.content;
