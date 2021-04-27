@@ -18,34 +18,42 @@ import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import Client.Client;
 
 public class Backgammon {
 
-    static Color CurrentPlayer = Color.YELLOW;
+    public static Backgammon ThisGame;
+    //karşı tarafın seçimi seçim -1 deyse seçilmemiş
+    public int RivalSelection = -1;
+    //benim seçimim seçim -1 deyse seçilmemiş
+    public int myselection = -1;
 
-    static int actualWidth = 1000;
-    static int actualHeight = 450;
-    static int extraWidth = 18;
-    static int extraHeight = 43;
+    Color CurrentPlayer = Color.YELLOW;
 
-    static Piece selectedPiece = null;
-    static Triangle target_triangle = null;
+    int actualWidth = 1000;
+    int actualHeight = 450;
+    int extraWidth = 18;
+    int extraHeight = 43;
 
-    static int X;
-    static int Y;
+    Piece selectedPiece = null;
+    Triangle target_triangle = null;
 
-    static int pieceR = 40; // radius
-    static int triangleW = 60; // triangle width
-    static int triangleH = 5 * pieceR; // triangle height
-    static int middleBar = 50 * (triangleW / 60);
+    int X;
+    int Y;
 
-    static int dice1 = 1;
-    static int dice2 = 1;
-    static int play = 0;    // each players can play 2, if dices are same, they can play 4
-    static boolean playDice = false;   // zar atıldı mı
-    static int[] steps = {0, 0, 0, 0};
+    int pieceR = 40; // radius
+    int triangleW = 60; // triangle width
+    int triangleH = 5 * pieceR; // triangle height
+    int middleBar = 50 * (triangleW / 60);
 
-    public static void main(String[] args) {
+    int dice1 = 1;
+    int dice2 = 1;
+    int play = 0;    // each players can play 2, if dices are same, they can play 4
+    boolean playDice = false;   // zar atıldı mı
+    int[] steps = {0, 0, 0, 0};
+
+    public Backgammon() {
+        ThisGame = this;
         JFrame jFrame = new JFrame();
         jFrame.setSize(actualWidth + extraWidth, actualHeight + extraHeight); // width + 18, height + 43
         jFrame.setTitle("Backgammon");
@@ -137,27 +145,6 @@ public class Backgammon {
                         boolean played = false;
                         play++;
                         if (play == 1) {
-                            /*
-                            if (triangles.get(dice1 - 1).pieces.isEmpty()) {
-                                if (CurrentPlayer == Color.BLUE) {
-                                    target_triangle = triangles.get(24 - dice1);
-                                    target_triangle.add(bar.remove(CurrentPlayer));
-                                } else {
-                                    target_triangle = triangles.get(dice1 - 1);
-                                    target_triangle.add(bar.remove(CurrentPlayer));
-                                }
-                            } else if (triangles.get(dice1 - 1).pieces.size() == 1) {
-                                Piece p = bar.remove(CurrentPlayer);
-                                if (CurrentPlayer == Color.BLUE) {
-                                    target_triangle = triangles.get(24 - dice1);
-                                } else {
-                                    target_triangle = triangles.get(dice1 - 1);
-                                }
-                                bar.add(target_triangle.remove());
-                                target_triangle.add(p);
-
-                            }
-                             */
 
                             if (CurrentPlayer == Color.BLUE) {
                                 if (triangles.get(24 - dice1).pieces.isEmpty()) {
@@ -183,27 +170,6 @@ public class Backgammon {
                             }
 
                         } else if (play <= 4) {
-                            /*
-                            if (triangles.get(dice2 - 1).pieces.isEmpty()) {
-                                if (CurrentPlayer == Color.BLUE) {
-                                    target_triangle = triangles.get(24 - dice2);
-                                    target_triangle.add(bar.remove(CurrentPlayer));
-                                } else {
-                                    target_triangle = triangles.get(dice2 - 1);
-                                    target_triangle.add(bar.remove(CurrentPlayer));
-                                }
-                            } else if (triangles.get(dice2 - 1).pieces.size() == 1) {
-                                Piece p = bar.remove(CurrentPlayer);
-                                if (CurrentPlayer == Color.BLUE) {
-                                    target_triangle = triangles.get(24 - dice2);
-                                } else {
-                                    target_triangle = triangles.get(dice2 - 1);
-                                }
-                                bar.add(target_triangle.remove());
-                                target_triangle.add(p);
-
-                            }
-                             */
 
                             if (CurrentPlayer == Color.BLUE) {
                                 if (triangles.get(24 - dice2).pieces.isEmpty()) {
@@ -329,7 +295,7 @@ public class Backgammon {
         });
 
         JButton jButton = new JButton("Dice");
-        jButton.setSize(70, 30);
+        jButton.setSize(90, 30);
         jButton.setLocation(800, 0);
 
         jButton.addActionListener(new ActionListener() {
@@ -357,9 +323,24 @@ public class Backgammon {
             }
         });
 
+        JButton connectServer = new JButton("Connect");
+        connectServer.setSize(90, 30);
+        connectServer.setLocation(800, 50);
+
+        connectServer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Client.Start("127.0.0.1", 2000);
+                //Client.Send(msg);
+            }
+        });
+
         jPanel.setLayout(null);
+
         jFrame.add(jButton);
+        jFrame.add(connectServer);
         jFrame.add(jPanel);
+
         jFrame.setVisible(true);
 
         /*
@@ -380,7 +361,7 @@ public class Backgammon {
 
     }
 
-    static void addElements(LinkedList list) {
+    void addElements(LinkedList list) {
         Color color = null;
         int partLenght = 6 * triangleW + middleBar;
         // Section 1
@@ -446,7 +427,7 @@ public class Backgammon {
 
     }
 
-    static int nextStep(int[] diceSteps, int j) {
+    int nextStep(int[] diceSteps, int j) {
         diceSteps[j] = 0;
         int dice = 0;
         for (int i = 0; i < diceSteps.length; i++) {
@@ -456,6 +437,11 @@ public class Backgammon {
             }
         }
         return dice;
+    }
+
+    public static void main(String[] args) {
+        new Backgammon();
+
     }
 
 }
