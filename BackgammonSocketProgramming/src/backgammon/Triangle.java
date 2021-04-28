@@ -4,20 +4,21 @@ import java.awt.Color;
 import java.util.LinkedList;
 
 
-public class Triangle {
+public class Triangle implements java.io.Serializable {
     int[] x;
     int[] y;
-    int id;
+    public int id;
     int width;
     Color color;
     
-    LinkedList<Piece> pieces = new LinkedList<>();
+    public LinkedList<Piece> pieces = new LinkedList<>();
     
     public Triangle(){
-        
+       
     }
     
     public Triangle(int[] x, int[] y, int id, Color color){
+        super();
         this.x = x;
         this.y = y;
         this.id = id;

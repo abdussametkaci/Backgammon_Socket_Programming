@@ -13,7 +13,12 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static Client.Client.sInput;
+import static Message.Message.Message_Type.Bar;
 import backgammon.Backgammon;
+import backgammon.Bar;
+import backgammon.Piece;
+import backgammon.Triangle;
+import java.util.LinkedList;
 
 /**
  *
@@ -31,30 +36,41 @@ class Listen extends Thread {
                 //mesaj gelirse bu satıra geçer
                 //mesaj tipine göre yapılacak işlemi ayır.
                 switch (received.type) {
-                    case Name:
-                        break;
                     case RivalConnected:
-                        /*
-                        String name = received.content.toString();
-                        Game.ThisGame.txt_rival_name.setText(name);
-                        Game.ThisGame.btn_pick.setEnabled(true);
-                        Game.ThisGame.btn_send_message.setEnabled(true);
-                        Game.ThisGame.tmr_slider.start();
-                         */
-                        System.out.println("eslestim beeee");
+                        
+                        String rivalMessage = received.content.toString();
+                        System.out.println(rivalMessage);
                         break;
                     case Disconnect:
                         break;
-                    case Text:
+                    case Dice:
                         //Backgammon.ThisGame.txt_receive.setText(received.content.toString());
                         int[] recv = (int[])received.content;
                         System.out.println("dice1: " + recv[0] + ", dice2: " + recv[1]);
                         Backgammon.setDices(recv[0], recv[1]);
                         Backgammon.repaint();
                         break;
+                    case Triangles:
+                        //LinkedList<Triangle> r = (LinkedList<Triangle>) received.content;
+                        /*
+                        System.out.println("triangles: ");
+                        for(Triangle t : r){
+                            System.out.println("t: " + t.id + ", size: " + t.size());
+                        }
+                        */
+                                
+                        Backgammon.setTriangles((LinkedList<Triangle>) received.content);
+                        Backgammon.repaint();
+                        System.out.println("taslari aldim");
+                        break;
+                    case Bar:
+                        Bar b = (Bar) received.content;
+                        Backgammon.setBar(b);
+                        Backgammon.repaint();
+                        System.out.println("bari aldim");
+                        break;
                     case Selected:
                         Backgammon.ThisGame.RivalSelection = (int) received.content;
-
                         break;
 
                     case Bitis:

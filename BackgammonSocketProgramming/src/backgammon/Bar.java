@@ -7,11 +7,12 @@ import java.util.LinkedList;
  *
  * @author asus
  */
-public class Bar {
+public class Bar implements java.io.Serializable{
 
     int x, y, width, height;
     LinkedList<Piece> piecesYellow = new LinkedList<>(); // yellow
     LinkedList<Piece> piecesBlue = new LinkedList<>(); // blue
+    
 
     public void add(Piece p) {
 

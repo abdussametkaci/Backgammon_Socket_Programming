@@ -53,6 +53,9 @@ public class Backgammon {
     boolean playDice = false;   // zar atıldı mı
     int[] steps = {0, 0, 0, 0};
     static JFrame jFrame;
+    static LinkedList<Triangle> triangles;
+    static Bar bar;
+
     public Backgammon() {
         ThisGame = this;
         jFrame = new JFrame();
@@ -60,10 +63,10 @@ public class Backgammon {
         jFrame.setTitle("Backgammon");
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        LinkedList<Triangle> triangles = new LinkedList<>();
+        triangles = new LinkedList<>();
         addElements(triangles);
 
-        Bar bar = new Bar();
+        bar = new Bar();
         bar.setBounds(6 * triangleW, 0, middleBar, actualHeight);
 
         JPanel jPanel = new JPanel() {
@@ -269,6 +272,27 @@ public class Backgammon {
                 }
 
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
+                for (Triangle t : triangles) {
+                    System.out.println("t: " + t.id + ", size: " + t.size());
+                }
+
+                // her zar attiginda mesaj atar
+                Message msg_p = new Message(Message.Message_Type.Triangles);
+                LinkedList<Triangle> t = new LinkedList<>();
+                t.addAll(triangles);
+                msg_p.content = t;
+                Client.Send(msg_p);
+
+
+                /*
+                Message msg_b = new Message(Message.Message_Type.Bar);
+                Bar b = new Bar();
+                b.piecesBlue.addAll(bar.piecesBlue);
+                b.piecesYellow.addAll(bar.piecesYellow);
+                msg_b.content = bar;
+                Client.Send(msg_b);
+                System.out.println("taslari gonderdim");
+                 */
             }
 
             @Override
@@ -322,7 +346,7 @@ public class Backgammon {
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
 
                 // her zar attiginda mesaj atar
-                Message msg = new Message(Message.Message_Type.Text);
+                Message msg = new Message(Message.Message_Type.Dice);
                 //msg.content = "dice1: " + dice1 + ", dice2: " + dice2;
                 int dices[] = {dice1, dice2};
                 msg.content = dices;
@@ -446,15 +470,31 @@ public class Backgammon {
         }
         return dice;
     }
-    
-   public static void repaint(){
-         jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
+
+    public static void repaint() {
+        jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
     }
-   
-   public static void setDices(int d1, int d2){
-       dice1 = d1;
-       dice2 = d2;
-   }
+
+    public static void setDices(int d1, int d2) {
+        dice1 = d1;
+        dice2 = d2;
+    }
+
+    public static void setTriangles(LinkedList<Triangle> t) {
+        for (Triangle tt : t) {
+            System.out.println("t: " + tt.id + ", size: " + tt.size());
+        }
+        triangles.clear();
+        triangles.addAll(t);
+
+    }
+
+    public static void setBar(Bar b) {
+        bar.piecesBlue.clear();
+        bar.piecesYellow.clear();
+        bar.piecesBlue.addAll(b.piecesBlue);
+        bar.piecesYellow.addAll(b.piecesYellow);
+    }
 
     public static void main(String[] args) {
         new Backgammon();

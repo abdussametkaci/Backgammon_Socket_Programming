@@ -82,7 +82,7 @@ public class SClient {
                     //mesaj tipine göre işlemlere ayır
                     switch (received.type) {
                         case Name:
-                            //TheClient.name = received.content.toString();
+                            TheClient.name = received.content.toString();
                             // isim verisini gönderdikten sonra eşleştirme işlemine başla
                             TheClient.pairThread.start();
                             break;
@@ -91,7 +91,17 @@ public class SClient {
                         case RivalConnected:
                             System.out.println("eslestim beeeee");
                             break;
-                        case Text:
+                        case Dice:
+                            //gelen metni direkt rakibe gönder
+                            Server.Send(TheClient.rival, received);
+                            //Backgammon.repaint();
+                            break;
+                        case Triangles:
+                            //gelen metni direkt rakibe gönder
+                            Server.Send(TheClient.rival, received);
+                            //Backgammon.repaint();
+                            break;
+                        case Bar:
                             //gelen metni direkt rakibe gönder
                             Server.Send(TheClient.rival, received);
                             //Backgammon.repaint();
@@ -164,11 +174,11 @@ public class SClient {
                         //her iki tarafada eşleşme mesajı gönder 
                         //oyunu başlat
                         Message msg1 = new Message(Message.Message_Type.RivalConnected);
-                        msg1.content = TheClient.name;
+                        msg1.content = "Rival Connected";
                         Server.Send(TheClient.rival, msg1);
 
                         Message msg2 = new Message(Message.Message_Type.RivalConnected);
-                        msg2.content = TheClient.rival.name;
+                        msg2.content = "Rival Connected";
                         Server.Send(TheClient, msg2);
                     }
                     //lock mekanizmasını servest bırak
