@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import Client.Client;
 import Message.Message;
+import javax.swing.JLabel;
 
 public class Backgammon {
 
@@ -52,7 +53,11 @@ public class Backgammon {
     static JFrame jFrame;   // my frame
     static LinkedList<Triangle> triangles; // contains pieces
     static Bar bar; // contains eaten pieces
-
+    
+    // show color of player and current player
+    static JLabel playerLabel;
+    static JLabel currentLabel;
+     
     public Backgammon() {
         ThisGame = this;
         jFrame = new JFrame();
@@ -333,12 +338,24 @@ public class Backgammon {
             }
 
         });
+        
+        JButton connectServer = new JButton("Connect"); // connect button
+        connectServer.setSize(90, 30);
+        connectServer.setLocation(800, 0);
 
-        JButton jButton = new JButton("Dice"); // dice button
-        jButton.setSize(90, 30);
-        jButton.setLocation(800, 0);
+        connectServer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Client.Start("127.0.0.1", 2000);
+                //Client.Send(msg);
+            }
+        });
 
-        jButton.addActionListener(new ActionListener() {
+        JButton diceButton = new JButton("Dice"); // dice button
+        diceButton.setSize(90, 30);
+        diceButton.setLocation(800, 50);
+
+        diceButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -369,23 +386,23 @@ public class Backgammon {
 
             }
         });
-
-        JButton connectServer = new JButton("Connect"); // connect button
-        connectServer.setSize(90, 30);
-        connectServer.setLocation(800, 50);
-
-        connectServer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Client.Start("127.0.0.1", 2000);
-                //Client.Send(msg);
-            }
-        });
+        
+        playerLabel = new JLabel();
+        playerLabel.setSize(150, 30);
+        playerLabel.setLocation(800, 100);
+        playerLabel.setText("Your Color: ");
+        
+        currentLabel = new JLabel();
+        currentLabel.setSize(150, 30);
+        currentLabel.setLocation(800, 150);
+        currentLabel.setText("Current Player Color: ");
 
         jPanel.setLayout(null);
 
-        jFrame.add(jButton);
+        jFrame.add(diceButton);
         jFrame.add(connectServer);
+        jFrame.add(playerLabel);
+        jFrame.add(currentLabel);
         jFrame.add(jPanel);
 
         jFrame.setVisible(true);
@@ -506,6 +523,8 @@ public class Backgammon {
             CurrentPlayer = Color.YELLOW;
             playerColor = Color.BLUE;
         }
+        playerLabel.setText("<html>Your Color:<br/>" + (playerColor.equals(Color.YELLOW) ? "Yellow" : "Blue") + "</html>");
+        currentLabel.setText("<html>Current Player Color:<br/>" + (CurrentPlayer.equals(Color.YELLOW) ? "Yellow" : "Blue") + "</html>");
     }
 
     public static void changeCurrentPlayer() {
@@ -514,6 +533,8 @@ public class Backgammon {
         } else {
             CurrentPlayer = Color.YELLOW;
         }
+        
+        currentLabel.setText("<html>Current Player Color:<br/>" + (CurrentPlayer.equals(Color.YELLOW) ? "Yellow" : "Blue") + "</html>");
     }
    
     public static void main(String[] args) {
