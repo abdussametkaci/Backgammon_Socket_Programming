@@ -9,10 +9,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static Client.Client.sInput;
 import static Message.Message.Message_Type.Bar;
+import static Message.Message.Message_Type.Color;
 import backgammon.Backgammon;
 import backgammon.Bar;
-import backgammon.Piece;
 import backgammon.Triangle;
+import java.awt.Color;
 import java.util.LinkedList;
 
 // Thread of listening coming messages from server
@@ -47,6 +48,14 @@ class Listen extends Thread {
                         Backgammon.setBar(b);
                         Backgammon.repaint();
                         System.out.println("get bar");
+                        break;
+                    case Color:
+                        Backgammon.setColor((int) received.content);
+                        System.out.println("client color: " + ((int) received.content));
+                        break;
+                    case ChangePlayer:
+                        Backgammon.changeCurrentPlayer();
+                        System.out.println("asdasdasdasd");
                         break;
                 }
 

@@ -25,7 +25,8 @@ public class Backgammon {
 
     public static Backgammon ThisGame;
 
-    Color CurrentPlayer = Color.YELLOW;
+    static Color CurrentPlayer; // = Color.YELLOW
+    static Color playerColor;
 
     static int actualWidth = 1000;
     static int actualHeight = 450;
@@ -143,6 +144,10 @@ public class Backgammon {
             @Override
             public void mouseClicked(MouseEvent me) {
                 // game algorithm
+                if (!playerColor.equals(CurrentPlayer)) {
+                    return;
+                }
+
                 if (!playDice) {
                     return;
                 }
@@ -206,16 +211,16 @@ public class Backgammon {
                             played = true;
                         }
 
-                        // change player and reset play
+                        // change next player and reset play
                         if ((dice1 == dice2 && play >= 4) || (dice1 != dice2 && play >= 2) || (!played)) {
                             // change next player
-                            if (CurrentPlayer.equals(Color.YELLOW)) {
-                                CurrentPlayer = Color.BLUE;
-                            } else {
-                                CurrentPlayer = Color.YELLOW;
-                            }
+                            changeCurrentPlayer();
                             play = 0;
                             playDice = false;
+
+                            Message msg = new Message(Message.Message_Type.ChangePlayer);
+                            msg.content = "Change Player";
+                            Client.Send(msg);
                         }
 
                     }
@@ -229,7 +234,6 @@ public class Backgammon {
                                 selectedPiece = t.pieces.getLast();
                                 if (!selectedPiece.color.equals(CurrentPlayer)) {
                                     System.out.println("piece color: " + selectedPiece.color + ", player color: " + CurrentPlayer);
-                                    System.out.println("return");
                                     return;
                                 }
 
@@ -261,13 +265,13 @@ public class Backgammon {
                                 System.out.println("player: " + CurrentPlayer + ", play: " + play);
                                 if ((dice1 == dice2 && play >= 4) || (dice1 != dice2 && play >= 2)) {
                                     // change next player
-                                    if (CurrentPlayer.equals(Color.YELLOW)) {
-                                        CurrentPlayer = Color.BLUE;
-                                    } else {
-                                        CurrentPlayer = Color.YELLOW;
-                                    }
+                                    changeCurrentPlayer();
                                     play = 0;
                                     playDice = false;
+
+                                    Message msg = new Message(Message.Message_Type.ChangePlayer);
+                                    msg.content = "Change Player";
+                                    Client.Send(msg);
                                 }
                                 break;
                             } catch (NoSuchElementException e) {
@@ -300,6 +304,8 @@ public class Backgammon {
                 msg_b.content = bar;
                 Client.Send(msg_b);
                 System.out.println("sended pieces");
+
+                System.out.println("player: " + playerColor + "current color: " + CurrentPlayer);
 
             }
 
@@ -396,10 +402,11 @@ public class Backgammon {
         System.out.println("actual width: " + actualWidth + " , actual height: " + actualHeight);
         System.out.println("width: " + jFrame.getWidth() + " , height: " + jFrame.getHeight());
          */
+        /*
         for (Triangle t : triangles) {
             System.out.println("id: " + t.id + ", width: " + t.width);
         }
-
+         */
     }
 
     // add all elements to lists
@@ -479,9 +486,6 @@ public class Backgammon {
     }
 
     public static void setTriangles(LinkedList<Triangle> t) {
-        for (Triangle tt : t) {
-            System.out.println("t: " + tt.id + ", size: " + tt.size());
-        }
         triangles.clear();
         triangles.addAll(t);
 
@@ -494,6 +498,24 @@ public class Backgammon {
         bar.piecesYellow.addAll(b.piecesYellow);
     }
 
+    public static void setColor(int c) {
+        if (c == 0) {
+            CurrentPlayer = Color.YELLOW;
+            playerColor = Color.YELLOW;
+        } else {
+            CurrentPlayer = Color.YELLOW;
+            playerColor = Color.BLUE;
+        }
+    }
+
+    public static void changeCurrentPlayer() {
+        if (CurrentPlayer.equals(Color.YELLOW)) {
+            CurrentPlayer = Color.BLUE;
+        } else {
+            CurrentPlayer = Color.YELLOW;
+        }
+    }
+   
     public static void main(String[] args) {
         new Backgammon();
 

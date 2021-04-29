@@ -3,7 +3,7 @@ package Message;
 public class Message implements java.io.Serializable {
 
     public static enum Message_Type {
-        None, Connected, Disconnected, RivalConnected, Text, Dice, Triangles, Bar
+        None, Connected, Disconnected, RivalConnected, Text, Dice, Triangles, Bar, Color, ChangePlayer
     }
 
     public Message_Type type;

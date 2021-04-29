@@ -8,6 +8,7 @@ import static java.lang.Thread.sleep;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.paint.Color;
 
 public class SClient {
 
@@ -74,15 +75,18 @@ public class SClient {
                         case Dice:
                             // send coming message to rival client
                             Server.Send(TheClient.rival, received);
-                            //Backgammon.repaint();
                             break;
                         case Triangles:
                             Server.Send(TheClient.rival, received);
-                            //Backgammon.repaint();
                             break;
                         case Bar:
                             Server.Send(TheClient.rival, received);
-                            //Backgammon.repaint();
+                            break;
+                        case Color:
+                            Server.Send(TheClient.rival, received);
+                            break;
+                        case ChangePlayer:
+                            Server.Send(TheClient.rival, received);
                             break;
                     }
 
@@ -146,6 +150,15 @@ public class SClient {
                         Message msg2 = new Message(Message.Message_Type.RivalConnected);
                         msg2.content = "Rival Connected";
                         Server.Send(TheClient, msg2);
+
+                        // choose color
+                        Message msg3 = new Message(Message.Message_Type.Color);
+                        msg3.content = 1;   // BLUE
+                        Server.Send(TheClient.rival, msg3);
+
+                        Message msg4 = new Message(Message.Message_Type.Color);
+                        msg4.content = 0;   // YELLOW
+                        Server.Send(TheClient, msg4);
                     }
                     // relesase the lock
                     // we can do this. Otherwise, it occur a deadlock
