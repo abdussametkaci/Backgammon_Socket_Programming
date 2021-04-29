@@ -24,10 +24,6 @@ import Message.Message;
 public class Backgammon {
 
     public static Backgammon ThisGame;
-    //karşı tarafın seçimi seçim -1 deyse seçilmemiş
-    public int RivalSelection = -1;
-    //benim seçimim seçim -1 deyse seçilmemiş
-    public int myselection = -1;
 
     Color CurrentPlayer = Color.YELLOW;
 
@@ -50,11 +46,11 @@ public class Backgammon {
     static int dice1 = 1;
     static int dice2 = 1;
     int play = 0;    // each players can play 2, if dices are same, they can play 4
-    boolean playDice = false;   // zar atıldı mı
+    boolean playDice = false;   // has the dice been rolled ?
     int[] steps = {0, 0, 0, 0};
-    static JFrame jFrame;
-    static LinkedList<Triangle> triangles;
-    static Bar bar;
+    static JFrame jFrame;   // my frame
+    static LinkedList<Triangle> triangles; // contains pieces
+    static Bar bar; // contains eaten pieces
 
     public Backgammon() {
         ThisGame = this;
@@ -69,9 +65,11 @@ public class Backgammon {
         bar = new Bar();
         bar.setBounds(6 * triangleW, 0, middleBar, actualHeight);
 
+        // draw all window elements
         JPanel jPanel = new JPanel() {
             @Override
             public void paint(Graphics g) {
+                // draw pieces
                 for (Triangle t : triangles) {
                     g.setColor(t.color);
                     g.fillPolygon(t.x, t.y, 3);
@@ -82,9 +80,11 @@ public class Backgammon {
                     }
                 }
 
+                // draw bar
                 g.setColor(Color.LIGHT_GRAY);
                 g.fillRect(bar.x, bar.y, bar.width, bar.height);
 
+                // write text, if a triangles has more than 5 pieces
                 for (Triangle t : triangles) {
                     if (t.size() > 5) {
                         g.setColor(Color.GREEN);
@@ -97,6 +97,7 @@ public class Backgammon {
                     }
                 }
 
+                // draw dieces
                 BufferedImage image = null;
                 BufferedImage image2 = null;
                 try {
@@ -109,6 +110,7 @@ public class Backgammon {
                 g.drawImage(image, 6 * triangleW, actualHeight / 2 - middleBar, this);
                 g.drawImage(image2, 6 * triangleW, actualHeight / 2, this);
 
+                // draw eaten pieces
                 for (Piece p : bar.piecesYellow) {
                     g.setColor(p.color);
                     g.fillOval(p.x, p.y, p.r, p.r);
@@ -119,6 +121,7 @@ public class Backgammon {
                     g.fillOval(p.x, p.y, p.r, p.r);
                 }
 
+                // write text that how many bar has pieces
                 if (bar.sizeYellow() > 0) {
                     g.setColor(Color.GREEN);
                     g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
@@ -135,22 +138,24 @@ public class Backgammon {
 
         };
 
+        // mouse cliecked for moving piece
         jFrame.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
-
+                // game algorithm
                 if (!playDice) {
                     return;
                 }
 
+                // if bar own a pices of current player
                 if (bar.hasPiece(CurrentPlayer)) {
                     System.out.println("bar");
-                    if (bar.x <= X && bar.x + bar.width >= X) {
+                    if (bar.x <= X && bar.x + bar.width >= X) { // cliecked bar
                         boolean played = false;
                         play++;
                         if (play == 1) {
 
-                            if (CurrentPlayer == Color.BLUE) {
+                            if (CurrentPlayer.equals(Color.BLUE)) {
                                 if (triangles.get(24 - dice1).pieces.isEmpty()) {
                                     target_triangle = triangles.get(24 - dice1);
                                     target_triangle.add(bar.remove(CurrentPlayer));
@@ -175,7 +180,7 @@ public class Backgammon {
 
                         } else if (play <= 4) {
 
-                            if (CurrentPlayer == Color.BLUE) {
+                            if (CurrentPlayer.equals(Color.BLUE)) {
                                 if (triangles.get(24 - dice2).pieces.isEmpty()) {
                                     target_triangle = triangles.get(24 - dice2);
                                     target_triangle.add(bar.remove(CurrentPlayer));
@@ -201,9 +206,10 @@ public class Backgammon {
                             played = true;
                         }
 
+                        // change player and reset play
                         if ((dice1 == dice2 && play >= 4) || (dice1 != dice2 && play >= 2) || (!played)) {
                             // change next player
-                            if (CurrentPlayer == Color.YELLOW) {
+                            if (CurrentPlayer.equals(Color.YELLOW)) {
                                 CurrentPlayer = Color.BLUE;
                             } else {
                                 CurrentPlayer = Color.YELLOW;
@@ -216,34 +222,36 @@ public class Backgammon {
                 } else {
 
                     for (Triangle t : triangles) {
-
+                        // cliecked triangle
                         if ((t.x[0] <= X && t.x[2] >= X && t.y[1] >= Y && t.y[0] <= Y) || (t.x[0] <= X && t.x[2] >= X && t.y[1] <= Y && t.y[0] >= Y)) {
                             System.out.println(t.id);
                             try {
                                 selectedPiece = t.pieces.getLast();
-                                if (selectedPiece.color != CurrentPlayer) {
+                                if (!selectedPiece.color.equals(CurrentPlayer)) {
+                                    System.out.println("piece color: " + selectedPiece.color + ", player color: " + CurrentPlayer);
+                                    System.out.println("return");
                                     return;
                                 }
 
                                 play++;
                                 if (play == 1) {
-                                    if (CurrentPlayer == Color.YELLOW) {
+                                    if (CurrentPlayer.equals(Color.YELLOW)) {
                                         target_triangle = triangles.get((t.id + dice1) % 24);
                                     } else {
                                         target_triangle = triangles.get((t.id - dice1) % 24);
                                     }
                                 } else if (play <= 4) {
-                                    if (CurrentPlayer == Color.YELLOW) {
+                                    if (CurrentPlayer.equals(Color.YELLOW)) {
                                         target_triangle = triangles.get((t.id + dice2) % 24);
                                     } else {
                                         target_triangle = triangles.get((t.id - dice2) % 24);
                                     }
                                 }
 
-                                if (target_triangle.size() == 1 && target_triangle.getLast().color != selectedPiece.color) {
+                                if (target_triangle.size() == 1 && (!target_triangle.getLast().color.equals(selectedPiece.color))) {
                                     Piece p = target_triangle.remove();
                                     bar.add(p);
-                                } else if (target_triangle.size() > 1 && target_triangle.getLast().color != selectedPiece.color) {
+                                } else if (target_triangle.size() > 1 && (!target_triangle.getLast().color.equals(selectedPiece.color))) {
                                     play--;
                                     return;
                                 }
@@ -253,7 +261,7 @@ public class Backgammon {
                                 System.out.println("player: " + CurrentPlayer + ", play: " + play);
                                 if ((dice1 == dice2 && play >= 4) || (dice1 != dice2 && play >= 2)) {
                                     // change next player
-                                    if (CurrentPlayer == Color.YELLOW) {
+                                    if (CurrentPlayer.equals(Color.YELLOW)) {
                                         CurrentPlayer = Color.BLUE;
                                     } else {
                                         CurrentPlayer = Color.YELLOW;
@@ -271,32 +279,33 @@ public class Backgammon {
                     }
                 }
 
+                //played piece
+                // redraw the game board
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
                 for (Triangle t : triangles) {
                     System.out.println("t: " + t.id + ", size: " + t.size());
                 }
 
-                // her zar attiginda mesaj atar
+                // send message when a piece move
                 Message msg_p = new Message(Message.Message_Type.Triangles);
                 LinkedList<Triangle> t = new LinkedList<>();
                 t.addAll(triangles);
                 msg_p.content = t;
                 Client.Send(msg_p);
 
-
-                /*
                 Message msg_b = new Message(Message.Message_Type.Bar);
                 Bar b = new Bar();
                 b.piecesBlue.addAll(bar.piecesBlue);
                 b.piecesYellow.addAll(bar.piecesYellow);
                 msg_b.content = bar;
                 Client.Send(msg_b);
-                System.out.println("taslari gonderdim");
-                 */
+                System.out.println("sended pieces");
+
             }
 
             @Override
             public void mousePressed(MouseEvent me) {
+                // mouse cliecked coordinates and fixed them
                 X = me.getX() - extraWidth < 0 ? 0 : me.getX() - extraWidth;
                 Y = me.getY() - extraHeight < 0 ? 0 : me.getY() - extraHeight;
                 // System.out.println("X: " + X + ", Y:" + Y);
@@ -319,7 +328,7 @@ public class Backgammon {
 
         });
 
-        JButton jButton = new JButton("Dice");
+        JButton jButton = new JButton("Dice"); // dice button
         jButton.setSize(90, 30);
         jButton.setLocation(800, 0);
 
@@ -345,7 +354,7 @@ public class Backgammon {
                 System.out.println("current player: " + CurrentPlayer);
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
 
-                // her zar attiginda mesaj atar
+                // send dices when dices rolled
                 Message msg = new Message(Message.Message_Type.Dice);
                 //msg.content = "dice1: " + dice1 + ", dice2: " + dice2;
                 int dices[] = {dice1, dice2};
@@ -355,7 +364,7 @@ public class Backgammon {
             }
         });
 
-        JButton connectServer = new JButton("Connect");
+        JButton connectServer = new JButton("Connect"); // connect button
         connectServer.setSize(90, 30);
         connectServer.setLocation(800, 50);
 
@@ -375,7 +384,7 @@ public class Backgammon {
 
         jFrame.setVisible(true);
 
-        /*
+        /* find actual size
         // get actual size
         Dimension actualSize = jFrame.getContentPane().getSize();
         actualWidth = actualSize.width;
@@ -393,6 +402,7 @@ public class Backgammon {
 
     }
 
+    // add all elements to lists
     void addElements(LinkedList list) {
         Color color = null;
         int partLenght = 6 * triangleW + middleBar;
@@ -457,18 +467,6 @@ public class Backgammon {
             }
         }
 
-    }
-
-    int nextStep(int[] diceSteps, int j) {
-        diceSteps[j] = 0;
-        int dice = 0;
-        for (int i = 0; i < diceSteps.length; i++) {
-            if (diceSteps[i] != 0) {
-                dice = diceSteps[i];
-                break;
-            }
-        }
-        return dice;
     }
 
     public static void repaint() {

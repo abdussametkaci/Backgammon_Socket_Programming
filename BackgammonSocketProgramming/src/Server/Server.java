@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Server;
 
 import Message.Message;
@@ -15,31 +10,26 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author INSECT
- */
-//client gelişini dinleme threadi
+// thread of coming client
 class ServerThread extends Thread {
 
     public void run() {
-        //server kapanana kadar dinle
+        // listen until server closed
         while (!Server.serverSocket.isClosed()) {
             try {
-                Server.Display("Client Bekleniyor...");
-                // clienti bekleyen satır
-                //bir client gelene kadar bekler
+                // wait client
+                Server.Display("Client waiting...");
+                //waiting until coming a client
                 Socket clientSocket = Server.serverSocket.accept();
-                //client gelirse bu satıra geçer
-                Server.Display("Client Geldi...");
-                //gelen client soketinden bir sclient nesnesi oluştur
-                //bir adet id de kendimiz verdik
+                // client came
+                Server.Display("Client came...");
+                // create a client object by using coming client from socket
                 SClient nclient = new SClient(clientSocket, Server.IdClient);
-                
+
                 Server.IdClient++;
-                //clienti listeye ekle.
+                // add client to list
                 Server.Clients.add(nclient);
-                //client mesaj dinlemesini başlat
+                // start listen thread for client
                 nclient.listenThread.start();
 
             } catch (IOException ex) {
@@ -51,21 +41,17 @@ class ServerThread extends Thread {
 
 public class Server {
 
-    //server soketi eklemeliyiz
     public static ServerSocket serverSocket;
     public static int IdClient = 0;
-    // Serverın dileyeceği port
     public static int port = 0;
-    //Serverı sürekli dinlemede tutacak thread nesnesi
+    // Thread object to keep the server listening continuously
     public static ServerThread runThread;
     //public static PairingThread pairThread;
 
     public static ArrayList<SClient> Clients = new ArrayList<>();
 
-    //semafor nesnesi
     public static Semaphore pairTwo = new Semaphore(1, true);
 
-    // başlaşmak için sadece port numarası veriyoruz
     public static void Start(int openport) {
         try {
             Server.port = openport;
@@ -80,13 +66,11 @@ public class Server {
     }
 
     public static void Display(String msg) {
-
         System.out.println(msg);
-
     }
 
-    // serverdan clietlara mesaj gönderme
-    //clieti alıyor ve mesaj olluyor
+    // send message from server to clients
+    // get client and send message
     public static void Send(SClient cl, Message msg) {
 
         try {

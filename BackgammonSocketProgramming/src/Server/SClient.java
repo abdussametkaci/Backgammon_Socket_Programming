@@ -1,13 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Server;
 
 import Message.Message;
-import static Message.Message.Message_Type.Selected;
-import backgammon.Backgammon;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,24 +9,16 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author INSECT
- */
 public class SClient {
 
     int id;
-    public String name = "NoName";
     Socket soket;
     ObjectOutputStream sOutput;
     ObjectInputStream sInput;
-    //clientten gelenleri dinleme threadi
-    Listen listenThread;
-    //cilent eşleştirme thredi
-    PairingThread pairThread;
-    //rakip client
-    SClient rival;
-    //eşleşme durumu
+    Listen listenThread; // Thread of thing that come from client
+    PairingThread pairThread; // Thread of pair
+    SClient rival;  // rival client
+
     public boolean paired = false;
 
     public SClient(Socket gelenSoket, int id) {
@@ -45,13 +30,12 @@ public class SClient {
         } catch (IOException ex) {
             Logger.getLogger(SClient.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //thread nesneleri
+
         this.listenThread = new Listen(this);
         this.pairThread = new PairingThread(this);
 
     }
 
-    //client mesaj gönderme
     public void Send(Message message) {
         try {
             this.sOutput.writeObject(message);
@@ -61,68 +45,54 @@ public class SClient {
 
     }
 
-    //client dinleme threadi
-    //her clientin ayrı bir dinleme thredi var
+    // Thread of listening to client
+    // every cilent own listen thread
     class Listen extends Thread {
 
         SClient TheClient;
 
-        //thread nesne alması için yapıcı metod
         Listen(SClient TheClient) {
             this.TheClient = TheClient;
         }
 
         public void run() {
-            //client bağlı olduğu sürece dönsün
+            // keep going as long as client is connected
             while (TheClient.soket.isConnected()) {
                 try {
-                    //mesajı bekleyen kod satırı
+                    // wait coming message
                     Message received = (Message) (TheClient.sInput.readObject());
-                    //mesaj gelirse bu satıra geçer
-                    //mesaj tipine göre işlemlere ayır
+                    // if a message come
+                    // find message type
                     switch (received.type) {
-                        case Name:
-                            TheClient.name = received.content.toString();
-                            // isim verisini gönderdikten sonra eşleştirme işlemine başla
+                        case Connected:
                             TheClient.pairThread.start();
                             break;
-                        case Disconnect:
+                        case Disconnected:
                             break;
                         case RivalConnected:
-                            System.out.println("eslestim beeeee");
                             break;
                         case Dice:
-                            //gelen metni direkt rakibe gönder
+                            // send coming message to rival client
                             Server.Send(TheClient.rival, received);
                             //Backgammon.repaint();
                             break;
                         case Triangles:
-                            //gelen metni direkt rakibe gönder
                             Server.Send(TheClient.rival, received);
                             //Backgammon.repaint();
                             break;
                         case Bar:
-                            //gelen metni direkt rakibe gönder
                             Server.Send(TheClient.rival, received);
                             //Backgammon.repaint();
                             break;
-                        case Selected:
-                            //gelen seçim yapıldı mesajını rakibe gönder
-                            Server.Send(TheClient.rival, received);
-                            break;
-                        case Bitis:
-                            break;
-
                     }
 
                 } catch (IOException ex) {
                     Logger.getLogger(SClient.class.getName()).log(Level.SEVERE, null, ex);
-                    //client bağlantısı koparsa listeden sil
+                    // if client is diconnected, delete it from the list
                     Server.Clients.remove(TheClient);
 
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(SClient.class.getName()).log(Level.SEVERE, null, ex);
-                    //client bağlantısı koparsa listeden sil
                     Server.Clients.remove(TheClient);
                 }
             }
@@ -130,8 +100,7 @@ public class SClient {
         }
     }
 
-    //eşleştirme threadi
-    //her clientin ayrı bir eşleştirme thredi var
+    // every client has pairing thread
     class PairingThread extends Thread {
 
         SClient TheClient;
@@ -141,23 +110,21 @@ public class SClient {
         }
 
         public void run() {
-            //client bağlı ve eşleşmemiş olduğu durumda dön
+            // keep going as long as client is connected and threre is no paired
             while (TheClient.soket.isConnected() && TheClient.paired == false) {
                 try {
-                    //lock mekanizması
-                    //sadece bir client içeri grebilir
-                    //diğerleri release olana kadar bekler
+                    //lock mechanizm
+                    // only one client can come
+                    // wait the others until they release
                     Server.pairTwo.acquire(1);
-                    
-                    //client eğer eşleşmemişse gir
+
                     if (!TheClient.paired) {
                         SClient crival = null;
-                        //eşleşme sağlanana kadar dön
+                        // keep going until there is a paired
                         while (crival == null && TheClient.soket.isConnected()) {
-                            //liste içerisinde eş arıyor
+                            // search rival
                             for (SClient clnt : Server.Clients) {
                                 if (TheClient != clnt && clnt.rival == null) {
-                                    //eşleşme sağlandı ve gerekli işaretlemeler yapıldı
                                     crival = clnt;
                                     crival.paired = true;
                                     crival.rival = TheClient;
@@ -166,13 +133,12 @@ public class SClient {
                                     break;
                                 }
                             }
-                            //sürekli dönmesin 1 saniyede bir dönsün
-                            //thredi uyutuyoruz
-                            sleep(1000);
+
+                            sleep(1000); // 1 second sleep
                         }
-                        //eşleşme oldu
-                        //her iki tarafada eşleşme mesajı gönder 
-                        //oyunu başlat
+                        // paired is ok
+                        // send a message to two clients (paired clients)
+                        // start game
                         Message msg1 = new Message(Message.Message_Type.RivalConnected);
                         msg1.content = "Rival Connected";
                         Server.Send(TheClient.rival, msg1);
@@ -181,8 +147,8 @@ public class SClient {
                         msg2.content = "Rival Connected";
                         Server.Send(TheClient, msg2);
                     }
-                    //lock mekanizmasını servest bırak
-                    //bırakılmazsa deadlock olur.
+                    // relesase the lock
+                    // we can do this. Otherwise, it occur a deadlock
                     Server.pairTwo.release(1);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(PairingThread.class.getName()).log(Level.SEVERE, null, ex);

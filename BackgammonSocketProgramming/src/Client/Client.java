@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Client;
 
 import Message.Message;
@@ -20,62 +15,39 @@ import backgammon.Piece;
 import backgammon.Triangle;
 import java.util.LinkedList;
 
-/**
- *
- * @author INSECT
- */
-// serverdan gelecek mesajları dinleyen thread
+// Thread of listening coming messages from server
 class Listen extends Thread {
 
     public void run() {
-        //soket bağlı olduğu sürece dön
+
         while (Client.socket.isConnected()) {
             try {
-                //mesaj gelmesini bloking olarak dinyelen komut
+                // listen the coming message by blocking
                 Message received = (Message) (sInput.readObject());
-                //mesaj gelirse bu satıra geçer
-                //mesaj tipine göre yapılacak işlemi ayır.
                 switch (received.type) {
                     case RivalConnected:
-                        
                         String rivalMessage = received.content.toString();
                         System.out.println(rivalMessage);
                         break;
-                    case Disconnect:
+                    case Disconnected:
                         break;
                     case Dice:
-                        //Backgammon.ThisGame.txt_receive.setText(received.content.toString());
-                        int[] recv = (int[])received.content;
+                        int[] recv = (int[]) received.content;
                         System.out.println("dice1: " + recv[0] + ", dice2: " + recv[1]);
                         Backgammon.setDices(recv[0], recv[1]);
                         Backgammon.repaint();
                         break;
                     case Triangles:
-                        //LinkedList<Triangle> r = (LinkedList<Triangle>) received.content;
-                        /*
-                        System.out.println("triangles: ");
-                        for(Triangle t : r){
-                            System.out.println("t: " + t.id + ", size: " + t.size());
-                        }
-                        */
-                                
                         Backgammon.setTriangles((LinkedList<Triangle>) received.content);
                         Backgammon.repaint();
-                        System.out.println("taslari aldim");
+                        System.out.println("get triangles");
                         break;
                     case Bar:
                         Bar b = (Bar) received.content;
                         Backgammon.setBar(b);
                         Backgammon.repaint();
-                        System.out.println("bari aldim");
+                        System.out.println("get bar");
                         break;
-                    case Selected:
-                        Backgammon.ThisGame.RivalSelection = (int) received.content;
-                        break;
-
-                    case Bitis:
-                        break;
-
                 }
 
             } catch (IOException ex) {
@@ -95,21 +67,18 @@ class Listen extends Thread {
 
 public class Client {
 
-    //her clientın bir soketi olmalı
     public static Socket socket;
 
-    //verileri almak için gerekli nesne
-    public static ObjectInputStream sInput;
-    //verileri göndermek için gerekli nesne
-    public static ObjectOutputStream sOutput;
-    //serverı dinleme thredi 
+    public static ObjectInputStream sInput; // for receiving data
+    public static ObjectOutputStream sOutput; // for transmitting data
+
     public static Listen listenMe;
 
     public static void Start(String ip, int port) {
         try {
-            // Client Soket nesnesi
+            // Client Soket
             Client.socket = new Socket(ip, port);
-            Client.Display("Servera bağlandı");
+            Client.Display("Connected to server");
             // input stream
             Client.sInput = new ObjectInputStream(Client.socket.getInputStream());
             // output stream
@@ -117,17 +86,17 @@ public class Client {
             Client.listenMe = new Listen();
             Client.listenMe.start();
 
-            //ilk mesaj olarak isim gönderiyorum
-            Message msg = new Message(Message.Message_Type.Name);
-            //msg.content = Game.ThisGame.txt_name.getText();
-            msg.content = "Player";
+            // it is first message
+            // message connected
+            Message msg = new Message(Message.Message_Type.Connected);
+            msg.content = "Connected";
             Client.Send(msg);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    //client durdurma fonksiyonu
+    // stop client
     public static void Stop() {
         try {
             if (Client.socket != null) {
@@ -150,10 +119,10 @@ public class Client {
 
     }
 
-    //mesaj gönderme fonksiyonu
     public static void Send(Message msg) {
         try {
             Client.sOutput.writeObject(msg);
+            sOutput.reset(); // it is so important !!!
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -3,16 +3,11 @@ package backgammon;
 import java.awt.Color;
 import java.util.LinkedList;
 
-/**
- *
- * @author asus
- */
-public class Bar implements java.io.Serializable{
+public class Bar implements java.io.Serializable {
 
     int x, y, width, height;
-    LinkedList<Piece> piecesYellow = new LinkedList<>(); // yellow
-    LinkedList<Piece> piecesBlue = new LinkedList<>(); // blue
-    
+    LinkedList<Piece> piecesYellow = new LinkedList<>(); // yellow pieces
+    LinkedList<Piece> piecesBlue = new LinkedList<>(); // blue pieces
 
     public void add(Piece p) {
 
@@ -24,7 +19,6 @@ public class Bar implements java.io.Serializable{
             piecesBlue.add(p);
         }
     }
-
 
     public void setBounds(int x, int y, int width, int height) {
         this.x = x;
@@ -40,15 +34,21 @@ public class Bar implements java.io.Serializable{
     public int sizeBlue() {
         return piecesBlue.size();
     }
-    
-    public Piece remove(Color player){
-        if(player == Color.YELLOW) return piecesYellow.removeLast();
-        else return piecesBlue.removeLast();
+
+    public Piece remove(Color player) {
+        if (player == Color.YELLOW) {
+            return piecesYellow.removeLast();
+        } else {
+            return piecesBlue.removeLast();
+        }
     }
-    
-    public Piece get(Color player){
-        if(player == Color.YELLOW) return piecesYellow.getLast();
-        else return piecesBlue.getLast();
+
+    public Piece get(Color player) {
+        if (player == Color.YELLOW) {
+            return piecesYellow.getLast();
+        } else {
+            return piecesBlue.getLast();
+        }
     }
 
     public boolean hasPiece(Color player) {
