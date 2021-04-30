@@ -58,6 +58,7 @@ class Listen extends Thread {
                         break;
                     case GiveUp:
                         Backgammon.giveUp();
+                        Client.Stop();
                         break;
                 }
 

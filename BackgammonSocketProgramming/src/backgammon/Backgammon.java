@@ -58,6 +58,7 @@ public class Backgammon {
     static JLabel playerLabel;
     static JLabel currentLabel;
     static JLabel giveUpLabel;
+    static boolean givedUp = false;
 
     public Backgammon() {
         ThisGame = this;
@@ -149,8 +150,16 @@ public class Backgammon {
         jFrame.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
+                if(givedUp){
+                    Client.Stop();
+                    return;
+                }
                 // game algorithm
-                if (!playerColor.equals(CurrentPlayer)) {
+                try {
+                    if (!playerColor.equals(CurrentPlayer)) {
+                        return;
+                    }
+                } catch (java.lang.NullPointerException e){
                     return;
                 }
 
@@ -387,24 +396,22 @@ public class Backgammon {
 
             }
         });
-        
+
         JButton giveUp = new JButton("Give Up"); // give up button
         giveUp.setSize(90, 30);
         giveUp.setLocation(800, 100);
-        
-        
+
         giveUp.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
                 // send dices when dices rolled
                 Message msg = new Message(Message.Message_Type.GiveUp);
-               
+
                 int dices[] = {dice1, dice2};
                 msg.content = "Give Up";
                 Client.Send(msg);
                 giveUpLabel.setText("Game Over!");
-
             }
         });
 
@@ -417,11 +424,10 @@ public class Backgammon {
         currentLabel.setSize(150, 30);
         currentLabel.setLocation(800, 180);
         currentLabel.setText("Current Player Color: ");
-        
+
         giveUpLabel = new JLabel();
         giveUpLabel.setSize(150, 30);
         giveUpLabel.setLocation(800, 230);
-        
 
         jPanel.setLayout(null);
 
@@ -564,8 +570,8 @@ public class Backgammon {
 
         currentLabel.setText("<html>Current Player Color:<br/>" + (CurrentPlayer.equals(Color.YELLOW) ? "Yellow" : "Blue") + "</html>");
     }
-    
-    public static void giveUp(){
+
+    public static void giveUp() {
         giveUpLabel.setText("WIN!");
     }
 

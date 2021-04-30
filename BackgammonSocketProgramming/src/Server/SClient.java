@@ -95,12 +95,12 @@ public class SClient {
                     }
 
                 } catch (IOException ex) {
-                    Logger.getLogger(SClient.class.getName()).log(Level.SEVERE, null, ex);
+                    //Logger.getLogger(SClient.class.getName()).log(Level.SEVERE, null, ex);
                     // if client is diconnected, delete it from the list
                     Server.Clients.remove(TheClient);
 
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(SClient.class.getName()).log(Level.SEVERE, null, ex);
+                    //Logger.getLogger(SClient.class.getName()).log(Level.SEVERE, null, ex);
                     Server.Clients.remove(TheClient);
                 }
             }
