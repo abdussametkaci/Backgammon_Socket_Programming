@@ -55,7 +55,9 @@ class Listen extends Thread {
                         break;
                     case ChangePlayer:
                         Backgammon.changeCurrentPlayer();
-                        System.out.println("asdasdasdasd");
+                        break;
+                    case GiveUp:
+                        Backgammon.giveUp();
                         break;
                 }
 

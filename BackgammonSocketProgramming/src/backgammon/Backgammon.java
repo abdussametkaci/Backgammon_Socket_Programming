@@ -53,11 +53,12 @@ public class Backgammon {
     static JFrame jFrame;   // my frame
     static LinkedList<Triangle> triangles; // contains pieces
     static Bar bar; // contains eaten pieces
-    
+
     // show color of player and current player
     static JLabel playerLabel;
     static JLabel currentLabel;
-     
+    static JLabel giveUpLabel;
+
     public Backgammon() {
         ThisGame = this;
         jFrame = new JFrame();
@@ -159,30 +160,28 @@ public class Backgammon {
 
                 // if bar own a pices of current player
                 if (bar.hasPiece(CurrentPlayer)) {
-                    System.out.println("bar");
+                    System.out.println("bar, current player: " + CurrentPlayer);
                     if (bar.x <= X && bar.x + bar.width >= X) { // cliecked bar
                         boolean played = false;
                         play++;
                         if (play == 1) {
 
                             if (CurrentPlayer.equals(Color.BLUE)) {
-                                if (triangles.get(24 - dice1).pieces.isEmpty()) {
-                                    target_triangle = triangles.get(24 - dice1);
+                                target_triangle = triangles.get(24 - dice1);
+                                if (triangles.get(24 - dice1).isEmpty() || CurrentPlayer.equals(target_triangle.getLast().color)) {
                                     target_triangle.add(bar.remove(CurrentPlayer));
-                                } else if (triangles.get(24 - dice1).pieces.size() == 1) {
+                                } else if (triangles.get(24 - dice1).size() == 1) {
                                     Piece p = bar.remove(CurrentPlayer);
-                                    target_triangle = triangles.get(24 - dice1);
                                     bar.add(target_triangle.remove());
                                     target_triangle.add(p);
                                 }
 
                             } else {
-                                if (triangles.get(dice1 - 1).pieces.isEmpty()) {
-                                    target_triangle = triangles.get(dice1 - 1);
+                                target_triangle = triangles.get(dice1 - 1);
+                                if (triangles.get(dice1 - 1).isEmpty() || CurrentPlayer.equals(target_triangle.getLast().color)) {
                                     target_triangle.add(bar.remove(CurrentPlayer));
-                                } else if (triangles.get(dice1 - 1).pieces.size() == 1) {
+                                } else if (triangles.get(dice1 - 1).size() == 1) {
                                     Piece p = bar.remove(CurrentPlayer);
-                                    target_triangle = triangles.get(dice1 - 1);
                                     bar.add(target_triangle.remove());
                                     target_triangle.add(p);
                                 }
@@ -191,23 +190,21 @@ public class Backgammon {
                         } else if (play <= 4) {
 
                             if (CurrentPlayer.equals(Color.BLUE)) {
-                                if (triangles.get(24 - dice2).pieces.isEmpty()) {
-                                    target_triangle = triangles.get(24 - dice2);
+                                target_triangle = triangles.get(24 - dice2);
+                                if (triangles.get(24 - dice2).isEmpty() || CurrentPlayer.equals(target_triangle.getLast().color)) {
                                     target_triangle.add(bar.remove(CurrentPlayer));
-                                } else if (triangles.get(24 - dice2).pieces.size() == 1) {
+                                } else if (triangles.get(24 - dice2).size() == 1) {
                                     Piece p = bar.remove(CurrentPlayer);
-                                    target_triangle = triangles.get(24 - dice2);
                                     bar.add(target_triangle.remove());
                                     target_triangle.add(p);
                                 }
 
                             } else {
-                                if (triangles.get(dice2 - 1).pieces.isEmpty()) {
-                                    target_triangle = triangles.get(dice2 - 1);
+                                target_triangle = triangles.get(dice2 - 1);
+                                if (triangles.get(dice2 - 1).isEmpty() || CurrentPlayer.equals(target_triangle.getLast().color)) {
                                     target_triangle.add(bar.remove(CurrentPlayer));
-                                } else if (triangles.get(dice2 - 1).pieces.size() == 1) {
+                                } else if (triangles.get(dice2 - 1).size() == 1) {
                                     Piece p = bar.remove(CurrentPlayer);
-                                    target_triangle = triangles.get(dice2 - 1);
                                     bar.add(target_triangle.remove());
                                     target_triangle.add(p);
                                 }
@@ -236,12 +233,13 @@ public class Backgammon {
                         if ((t.x[0] <= X && t.x[2] >= X && t.y[1] >= Y && t.y[0] <= Y) || (t.x[0] <= X && t.x[2] >= X && t.y[1] <= Y && t.y[0] >= Y)) {
                             System.out.println(t.id);
                             try {
-                                selectedPiece = t.pieces.getLast();
-                                if (!selectedPiece.color.equals(CurrentPlayer)) {
-                                    System.out.println("piece color: " + selectedPiece.color + ", player color: " + CurrentPlayer);
+                                selectedPiece = t.getLast();
+                                if (!selectedPiece.color.equals(CurrentPlayer)) { // is it correct player
+                                    System.out.println("piece color: " + selectedPiece.color + ", current player color: " + CurrentPlayer);
                                     return;
                                 }
 
+                                // Selection targte triangle
                                 play++;
                                 if (play == 1) {
                                     if (CurrentPlayer.equals(Color.YELLOW)) {
@@ -257,6 +255,7 @@ public class Backgammon {
                                     }
                                 }
 
+                                // eat piece
                                 if (target_triangle.size() == 1 && (!target_triangle.getLast().color.equals(selectedPiece.color))) {
                                     Piece p = target_triangle.remove();
                                     bar.add(p);
@@ -265,7 +264,7 @@ public class Backgammon {
                                     return;
                                 }
 
-                                selectedPiece = t.pieces.removeLast();
+                                selectedPiece = t.remove();
                                 target_triangle.add(selectedPiece);
                                 System.out.println("player: " + CurrentPlayer + ", play: " + play);
                                 if ((dice1 == dice2 && play >= 4) || (dice1 != dice2 && play >= 2)) {
@@ -291,9 +290,11 @@ public class Backgammon {
                 //played piece
                 // redraw the game board
                 jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
+                /*
                 for (Triangle t : triangles) {
                     System.out.println("t: " + t.id + ", size: " + t.size());
                 }
+                 */
 
                 // send message when a piece move
                 Message msg_p = new Message(Message.Message_Type.Triangles);
@@ -338,7 +339,7 @@ public class Backgammon {
             }
 
         });
-        
+
         JButton connectServer = new JButton("Connect"); // connect button
         connectServer.setSize(90, 30);
         connectServer.setLocation(800, 0);
@@ -387,22 +388,49 @@ public class Backgammon {
             }
         });
         
+        JButton giveUp = new JButton("Give Up"); // give up button
+        giveUp.setSize(90, 30);
+        giveUp.setLocation(800, 100);
+        
+        
+        giveUp.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                // send dices when dices rolled
+                Message msg = new Message(Message.Message_Type.GiveUp);
+               
+                int dices[] = {dice1, dice2};
+                msg.content = "Give Up";
+                Client.Send(msg);
+                giveUpLabel.setText("Game Over!");
+
+            }
+        });
+
         playerLabel = new JLabel();
         playerLabel.setSize(150, 30);
-        playerLabel.setLocation(800, 100);
+        playerLabel.setLocation(800, 130);
         playerLabel.setText("Your Color: ");
-        
+
         currentLabel = new JLabel();
         currentLabel.setSize(150, 30);
-        currentLabel.setLocation(800, 150);
+        currentLabel.setLocation(800, 180);
         currentLabel.setText("Current Player Color: ");
+        
+        giveUpLabel = new JLabel();
+        giveUpLabel.setSize(150, 30);
+        giveUpLabel.setLocation(800, 230);
+        
 
         jPanel.setLayout(null);
 
         jFrame.add(diceButton);
         jFrame.add(connectServer);
+        jFrame.add(giveUp);
         jFrame.add(playerLabel);
         jFrame.add(currentLabel);
+        jFrame.add(giveUpLabel);
         jFrame.add(jPanel);
 
         jFrame.setVisible(true);
@@ -419,7 +447,7 @@ public class Backgammon {
         System.out.println("actual width: " + actualWidth + " , actual height: " + actualHeight);
         System.out.println("width: " + jFrame.getWidth() + " , height: " + jFrame.getHeight());
          */
-        /*
+ /*
         for (Triangle t : triangles) {
             System.out.println("id: " + t.id + ", width: " + t.width);
         }
@@ -533,10 +561,14 @@ public class Backgammon {
         } else {
             CurrentPlayer = Color.YELLOW;
         }
-        
+
         currentLabel.setText("<html>Current Player Color:<br/>" + (CurrentPlayer.equals(Color.YELLOW) ? "Yellow" : "Blue") + "</html>");
     }
-   
+    
+    public static void giveUp(){
+        giveUpLabel.setText("WIN!");
+    }
+
     public static void main(String[] args) {
         new Backgammon();
 

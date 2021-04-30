@@ -57,5 +57,9 @@ public class Triangle implements java.io.Serializable {
     public int size() {
         return pieces.size();
     }
+    
+    public boolean isEmpty(){
+        return pieces.isEmpty();
+    }
 
 }

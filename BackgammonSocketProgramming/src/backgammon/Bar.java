@@ -11,7 +11,7 @@ public class Bar implements java.io.Serializable {
 
     public void add(Piece p) {
 
-        if (p.color == Color.YELLOW) {
+        if (p.color.equals(Color.YELLOW)) {
             p.setCoordinate(x + 5, y);
             piecesYellow.add(p);
         } else {
@@ -36,7 +36,7 @@ public class Bar implements java.io.Serializable {
     }
 
     public Piece remove(Color player) {
-        if (player == Color.YELLOW) {
+        if (player.equals(Color.YELLOW)) {
             return piecesYellow.removeLast();
         } else {
             return piecesBlue.removeLast();
@@ -44,7 +44,7 @@ public class Bar implements java.io.Serializable {
     }
 
     public Piece get(Color player) {
-        if (player == Color.YELLOW) {
+        if (player.equals(Color.YELLOW)) {
             return piecesYellow.getLast();
         } else {
             return piecesBlue.getLast();
@@ -52,9 +52,9 @@ public class Bar implements java.io.Serializable {
     }
 
     public boolean hasPiece(Color player) {
-        if (player == Color.YELLOW && sizeYellow() > 0) {
+        if (player.equals(Color.YELLOW) && sizeYellow() > 0) {
             return true;
-        } else if (player == Color.BLUE && sizeBlue() > 0) {
+        } else if (player.equals(Color.BLUE) && sizeBlue() > 0) {
             return true;
         }
         return false;

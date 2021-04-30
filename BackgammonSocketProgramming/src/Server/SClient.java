@@ -88,6 +88,10 @@ public class SClient {
                         case ChangePlayer:
                             Server.Send(TheClient.rival, received);
                             break;
+                        case GiveUp:
+                            Server.Send(TheClient.rival, received);
+                            break;
+                        
                     }
 
                 } catch (IOException ex) {
