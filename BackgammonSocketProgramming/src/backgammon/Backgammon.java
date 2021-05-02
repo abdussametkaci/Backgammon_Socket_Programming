@@ -60,6 +60,9 @@ public class Backgammon {
     static JLabel giveUpLabel;
     static boolean givedUp = false;
 
+    static JButton connectServer;
+    static JButton diceButton;
+
     public Backgammon() {
         ThisGame = this;
         jFrame = new JFrame();
@@ -150,7 +153,7 @@ public class Backgammon {
         jFrame.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
-                if(givedUp){
+                if (givedUp) {
                     Client.Stop();
                     return;
                 }
@@ -159,7 +162,7 @@ public class Backgammon {
                     if (!playerColor.equals(CurrentPlayer)) {
                         return;
                     }
-                } catch (java.lang.NullPointerException e){
+                } catch (java.lang.NullPointerException e) {
                     return;
                 }
 
@@ -349,7 +352,7 @@ public class Backgammon {
 
         });
 
-        JButton connectServer = new JButton("Connect"); // connect button
+        connectServer = new JButton("Connect"); // connect button
         connectServer.setSize(90, 30);
         connectServer.setLocation(800, 0);
 
@@ -358,10 +361,11 @@ public class Backgammon {
             public void actionPerformed(ActionEvent e) {
                 Client.Start("127.0.0.1", 2000);
                 //Client.Send(msg);
+                connectServer.setEnabled(false);
             }
         });
 
-        JButton diceButton = new JButton("Dice"); // dice button
+        diceButton = new JButton("Dice"); // dice button
         diceButton.setSize(90, 30);
         diceButton.setLocation(800, 50);
 
@@ -534,6 +538,16 @@ public class Backgammon {
     public static void setDices(int d1, int d2) {
         dice1 = d1;
         dice2 = d2;
+        chhangeDiceStates();
+    }
+    
+    private static void chhangeDiceStates(){
+        if (CurrentPlayer.equals(playerColor)) {
+            diceButton.setEnabled(true);
+        }
+        else{
+            diceButton.setEnabled(false);
+        }
     }
 
     public static void setTriangles(LinkedList<Triangle> t) {
@@ -569,6 +583,8 @@ public class Backgammon {
         }
 
         currentLabel.setText("<html>Current Player Color:<br/>" + (CurrentPlayer.equals(Color.YELLOW) ? "Yellow" : "Blue") + "</html>");
+        
+        chhangeDiceStates();
     }
 
     public static void giveUp() {
