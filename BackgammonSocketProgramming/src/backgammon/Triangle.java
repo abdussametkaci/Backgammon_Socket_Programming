@@ -24,7 +24,8 @@ public class Triangle implements java.io.Serializable {
         this.color = color;
         this.width = x[2] - x[0];
     }
-
+    
+    // add piece for triangle id
     public void add(Piece p) {
         if (pieces.isEmpty()) {
             if (this.id < 12) {

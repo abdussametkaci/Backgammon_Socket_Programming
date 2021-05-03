@@ -8,7 +8,8 @@ public class Bar implements java.io.Serializable {
     int x, y, width, height;
     LinkedList<Piece> piecesYellow = new LinkedList<>(); // yellow pieces
     LinkedList<Piece> piecesBlue = new LinkedList<>(); // blue pieces
-
+    
+    // add piece for color and set coordinates
     public void add(Piece p) {
 
         if (p.color.equals(Color.YELLOW)) {
@@ -34,7 +35,8 @@ public class Bar implements java.io.Serializable {
     public int sizeBlue() {
         return piecesBlue.size();
     }
-
+    
+    // remove last piece by using color from bar
     public Piece remove(Color player) {
         if (player.equals(Color.YELLOW)) {
             return piecesYellow.removeLast();
@@ -42,7 +44,8 @@ public class Bar implements java.io.Serializable {
             return piecesBlue.removeLast();
         }
     }
-
+    
+    // get piece selected color from bar
     public Piece get(Color player) {
         if (player.equals(Color.YELLOW)) {
             return piecesYellow.getLast();
@@ -50,7 +53,8 @@ public class Bar implements java.io.Serializable {
             return piecesBlue.getLast();
         }
     }
-
+    
+    // check a player has piece on bar
     public boolean hasPiece(Color player) {
         if (player.equals(Color.YELLOW) && sizeYellow() > 0) {
             return true;

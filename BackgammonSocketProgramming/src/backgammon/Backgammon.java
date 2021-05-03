@@ -26,8 +26,8 @@ public class Backgammon {
 
     public static Backgammon ThisGame;
 
-    static Color CurrentPlayer; // = Color.YELLOW
-    static Color playerColor;
+    static Color CurrentPlayer; // current player
+    static Color playerColor;   // client color actually
 
     static int actualWidth = 1000;
     static int actualHeight = 450;
@@ -37,8 +37,8 @@ public class Backgammon {
     Piece selectedPiece = null;
     Triangle target_triangle = null;
 
-    int X;
-    int Y;
+    int X; // mouse x
+    int Y; // mouse y
 
     static int pieceR = 40; // radius
     static int triangleW = 60; // triangle width
@@ -251,7 +251,7 @@ public class Backgammon {
                                     return;
                                 }
 
-                                // Selection targte triangle
+                                // Selection target triangle
                                 play++;
                                 if (play == 1) {
                                     if (CurrentPlayer.equals(Color.YELLOW)) {
@@ -530,18 +530,22 @@ public class Backgammon {
         }
 
     }
-
+    
+    // repaint the game board for specific area
     public static void repaint() {
         jFrame.repaint(0, 0, 12 * triangleW + middleBar + extraWidth, actualHeight + extraHeight);
     }
-
+    
+    // set dice value
     public static void setDices(int d1, int d2) {
         dice1 = d1;
         dice2 = d2;
-        chhangeDiceStates();
+        changeDiceStates();
     }
     
-    private static void chhangeDiceStates(){
+    // change dice state for every client
+    // adjust button enabled
+    private static void changeDiceStates(){
         if (CurrentPlayer.equals(playerColor)) {
             diceButton.setEnabled(true);
         }
@@ -549,20 +553,23 @@ public class Backgammon {
             diceButton.setEnabled(false);
         }
     }
-
+    
+    // clear triangles and add all elements
     public static void setTriangles(LinkedList<Triangle> t) {
         triangles.clear();
         triangles.addAll(t);
 
     }
-
+    
+    // clear yellow and blue pieces lists and add all elements
     public static void setBar(Bar b) {
         bar.piecesBlue.clear();
         bar.piecesYellow.clear();
         bar.piecesBlue.addAll(b.piecesBlue);
         bar.piecesYellow.addAll(b.piecesYellow);
     }
-
+    
+    // set color of current player and player
     public static void setColor(int c) {
         if (c == 0) {
             CurrentPlayer = Color.YELLOW;
@@ -575,6 +582,8 @@ public class Backgammon {
         currentLabel.setText("<html>Current Player Color:<br/>" + (CurrentPlayer.equals(Color.YELLOW) ? "Yellow" : "Blue") + "</html>");
     }
 
+    // change current player
+    // show this info to clients
     public static void changeCurrentPlayer() {
         if (CurrentPlayer.equals(Color.YELLOW)) {
             CurrentPlayer = Color.BLUE;
@@ -584,9 +593,11 @@ public class Backgammon {
 
         currentLabel.setText("<html>Current Player Color:<br/>" + (CurrentPlayer.equals(Color.YELLOW) ? "Yellow" : "Blue") + "</html>");
         
-        chhangeDiceStates();
+        changeDiceStates();
     }
-
+    
+    // who give up is game over
+    // rival is win
     public static void giveUp() {
         giveUpLabel.setText("WIN!");
     }

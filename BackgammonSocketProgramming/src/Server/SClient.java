@@ -68,8 +68,6 @@ public class SClient {
                         case Connected:
                             TheClient.pairThread.start();
                             break;
-                        case Disconnected:
-                            break;
                         case RivalConnected:
                             break;
                         case Dice:

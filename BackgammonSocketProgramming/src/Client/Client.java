@@ -30,30 +30,33 @@ class Listen extends Thread {
                         String rivalMessage = received.content.toString();
                         System.out.println(rivalMessage);
                         break;
-                    case Disconnected:
-                        break;
                     case Dice:
+                        // receive dices and repaint the game board
                         int[] recv = (int[]) received.content;
                         System.out.println("dice1: " + recv[0] + ", dice2: " + recv[1]);
                         Backgammon.setDices(recv[0], recv[1]);
                         Backgammon.repaint();
                         break;
                     case Triangles:
+                        // set triangles and repaint the game board
                         Backgammon.setTriangles((LinkedList<Triangle>) received.content);
                         Backgammon.repaint();
                         System.out.println("get triangles");
                         break;
                     case Bar:
+                        // set bar and repaint the game board
                         Bar b = (Bar) received.content;
                         Backgammon.setBar(b);
                         Backgammon.repaint();
                         System.out.println("get bar");
                         break;
                     case Color:
+                        // set color of client
                         Backgammon.setColor((int) received.content);
                         System.out.println("client color: " + ((int) received.content));
                         break;
                     case ChangePlayer:
+                        // change current player
                         Backgammon.changeCurrentPlayer();
                         break;
                     case GiveUp:
